@@ -1,0 +1,134 @@
+package com.beachape.quiam.infra.users;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+
+@SuppressWarnings("StringSplitter")
+class PasswordHasherTest {
+
+  private PasswordHasher hasher;
+
+  @BeforeEach
+  void setUp() {
+    hasher = new PasswordHasher();
+  }
+
+  @Test
+  void hashPassword_shouldGenerateValidHash() {
+    // Given
+    String password = "correctPassword123!";
+
+    // When
+    String hashedPassword = hasher.hashPassword(password);
+
+    // Then
+    String[] parts = hashedPassword.split(":");
+    assertEquals(3, parts.length);
+    assertEquals("600000", parts[0]);
+    assertTrue(parts[1].length() > 0); // salt
+    assertTrue(parts[2].length() > 0); // hash
+  }
+
+  @Test
+  void verifyPassword_shouldReturnTrue_whenPasswordIsCorrect() {
+    // Given
+    String password = "correctPassword123!";
+    String hashedPassword = hasher.hashPassword(password);
+
+    // When
+    boolean result = hasher.verifyPassword(password, hashedPassword);
+
+    // Then
+    assertTrue(result);
+  }
+
+  @Test
+  void verifyPassword_shouldReturnFalse_whenPasswordIsIncorrect() {
+    // Given
+    String password = "correctPassword123!";
+    String wrongPassword = "wrongPassword123!";
+    String hashedPassword = hasher.hashPassword(password);
+
+    // When
+    boolean result = hasher.verifyPassword(wrongPassword, hashedPassword);
+
+    // Then
+    assertFalse(result);
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "", // empty string
+        ":", // single colon
+        "a:b", // two parts
+        "a:b:c:d", // four parts
+        "notanumber:salt:hash", // invalid iteration count
+        "1:!@#:hash", // invalid base64 salt
+        "1:salt:!@#" // invalid base64 hash
+      })
+  void verifyPassword_shouldReturnFalse_whenHashFormatIsInvalid(String invalidHash) {
+    assertFalse(hasher.verifyPassword("anyPassword", invalidHash));
+  }
+
+  @ParameterizedTest
+  @MethodSource("passwordTestCases")
+  void shouldVerify_variousPasswordTypes(String password) {
+    // Given
+    String hashedPassword = hasher.hashPassword(password);
+
+    // When
+    boolean result = hasher.verifyPassword(password, hashedPassword);
+
+    // Then
+    assertTrue(result);
+  }
+
+  private static Stream<Arguments> passwordTestCases() {
+    return Stream.of(
+        Arguments.of("simple"),
+        Arguments.of("Complex Password 123!@#"),
+        Arguments.of("वेरी लॉन्ग पासवर्ड"), // Unicode password
+        Arguments.of(" leading and trailing spaces "),
+        Arguments.of("a".repeat(100)) // very long password
+        );
+  }
+
+  @Test
+  void hashPassword_shouldGenerateDifferentHashes_forSamePassword() {
+    // Given
+    String password = "samePassword123!";
+
+    // When
+    String hash1 = hasher.hashPassword(password);
+    String hash2 = hasher.hashPassword(password);
+
+    // Then
+    assertNotEquals(hash1, hash2);
+  }
+
+  @Test
+  void verifyPassword_shouldReturnFalse_whenIterationsAreDifferent() {
+    // Given
+    String password = "testPassword";
+    String hashedPassword = hasher.hashPassword(password);
+    String[] parts = hashedPassword.split(":");
+    String modifiedHash = "500000:" + parts[1] + ":" + parts[2];
+
+    // When
+    boolean result = hasher.verifyPassword(password, modifiedHash);
+
+    // Then
+    assertFalse(result);
+  }
+}
