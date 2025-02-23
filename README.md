@@ -1,4 +1,5 @@
 # qu-iam
+[![CI](https://github.com/lloydmeta/qu-iam/actions/workflows/ci.yml/badge.svg)](https://github.com/lloydmeta/qu-iam/actions/workflows/ci.yml) 
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
