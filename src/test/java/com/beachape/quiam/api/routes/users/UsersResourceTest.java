@@ -1,4 +1,4 @@
-package com.beachape.quiam.api.users;
+package com.beachape.quiam.api.routes.users;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -7,9 +7,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.beachape.quiam.domain.jwt.JwtService;
-import com.beachape.quiam.domain.users.UpsertUser;
-import com.beachape.quiam.domain.users.User;
 import com.beachape.quiam.domain.users.UsersService;
+import com.beachape.quiam.domain.users.UsersService.UpsertUser;
+import com.beachape.quiam.domain.users.UsersService.User;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.ws.rs.core.MediaType;

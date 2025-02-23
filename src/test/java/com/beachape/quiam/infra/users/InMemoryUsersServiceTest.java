@@ -4,10 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.beachape.quiam.domain.users.UpsertUser;
-import com.beachape.quiam.domain.users.User;
 import com.beachape.quiam.domain.users.UsersService.InvalidPassword;
 import com.beachape.quiam.domain.users.UsersService.NoSuchUser;
+import com.beachape.quiam.domain.users.UsersService.UpsertUser;
+import com.beachape.quiam.domain.users.UsersService.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

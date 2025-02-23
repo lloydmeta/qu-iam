@@ -1,10 +1,10 @@
-package com.beachape.quiam.api.users;
+package com.beachape.quiam.api.routes.users;
 
 import com.beachape.quiam.api.authentication.JwtIdentityProvider;
 import com.beachape.quiam.domain.jwt.JwtService;
-import com.beachape.quiam.domain.users.UpsertUser;
-import com.beachape.quiam.domain.users.User;
 import com.beachape.quiam.domain.users.UsersService;
+import com.beachape.quiam.domain.users.UsersService.UpsertUser;
+import com.beachape.quiam.domain.users.UsersService.User;
 import io.quarkus.security.Authenticated;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.common.annotation.RunOnVirtualThread;

@@ -1,4 +1,4 @@
-package com.beachape.quiam.api.users;
+package com.beachape.quiam.api.routes.users;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
@@ -16,5 +16,5 @@ public final class DataTransferObjects {
 
   public static record ErrorResponse(String error) {}
 
-  public record UserResponse(String username) {}
+  public static record UserResponse(String username) {}
 }

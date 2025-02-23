@@ -1,4 +1,4 @@
-package com.beachape.quiam.api.users;
+package com.beachape.quiam.api.routes.users;
 
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 
