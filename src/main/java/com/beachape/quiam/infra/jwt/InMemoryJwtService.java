@@ -3,6 +3,7 @@ package com.beachape.quiam.infra.jwt;
 import com.beachape.quiam.domain.apikeys.ApiKeyService;
 import com.beachape.quiam.domain.crypto.AsymmetricKeysManager;
 import com.beachape.quiam.domain.jwt.JwtService;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.smallrye.jwt.auth.principal.JWTParser;
 import io.smallrye.jwt.build.Jwt;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -25,6 +26,7 @@ public class InMemoryJwtService implements JwtService {
     this.parser = parser;
   }
 
+  @WithSpan
   @Override
   public String createToken(String userId) {
 
@@ -36,6 +38,7 @@ public class InMemoryJwtService implements JwtService {
         .sign(keysManager.getPrivateKey());
   }
 
+  @WithSpan
   @Override
   public String validateToken(String token) throws TokenValidationException {
     try {
@@ -48,6 +51,7 @@ public class InMemoryJwtService implements JwtService {
     }
   }
 
+  @WithSpan
   @Override
   public void invalidateToken(String token) throws TokenValidationException {
     try {
