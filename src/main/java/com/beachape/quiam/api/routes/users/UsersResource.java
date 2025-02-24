@@ -5,9 +5,11 @@ import com.beachape.quiam.domain.jwt.JwtService;
 import com.beachape.quiam.domain.users.UsersService;
 import com.beachape.quiam.domain.users.UsersService.UpsertUser;
 import com.beachape.quiam.domain.users.UsersService.User;
+
 import io.quarkus.security.Authenticated;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.common.annotation.RunOnVirtualThread;
+import io.vertx.core.http.HttpServerRequest;
 import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -49,7 +51,8 @@ public class UsersResource {
   @PermitAll
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response authenticate(DataTransferObjects.AuthenticationRequest request) {
+  public Response authenticate(
+      DataTransferObjects.AuthenticationRequest request, @Context HttpServerRequest serverRequest) {
     try {
       User user = usersService.authenticate(request.username(), request.password());
       String token = jwtService.createToken(user.name());
@@ -58,8 +61,8 @@ public class UsersResource {
           new NewCookie.Builder("session")
               .value(token)
               .path("/")
-              .secure(true)
               .httpOnly(true)
+              .secure(serverRequest.isSSL())
               .build();
 
       return Response.ok(new DataTransferObjects.AuthenticationResponse(user.name(), token))
@@ -81,7 +84,8 @@ public class UsersResource {
   @Authenticated
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes({MediaType.APPLICATION_JSON, MediaType.WILDCARD})
-  public Response logout(@Context SecurityIdentity securityIdentity) {
+  public Response logout(
+      @Context SecurityIdentity securityIdentity, @Context HttpServerRequest serverRequest) {
     try {
       String token = securityIdentity.getAttribute(JwtIdentityProvider.JWT_TOKEN_KEY);
       jwtService.invalidateToken(token);
@@ -91,8 +95,8 @@ public class UsersResource {
               .value("")
               .path("/")
               .maxAge(0)
-              .secure(true)
               .httpOnly(true)
+              .secure(serverRequest.isSSL())
               .build();
 
       return Response.ok().cookie(clearCookie).build();
