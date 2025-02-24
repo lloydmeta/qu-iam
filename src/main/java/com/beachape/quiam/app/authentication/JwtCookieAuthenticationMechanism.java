@@ -1,4 +1,4 @@
-package com.beachape.quiam.api.authentication;
+package com.beachape.quiam.app.authentication;
 
 import io.quarkus.security.credential.TokenCredential;
 import io.quarkus.security.identity.IdentityProviderManager;
@@ -17,26 +17,31 @@ import java.util.Collections;
 import java.util.Set;
 
 @ApplicationScoped
-@Priority(3)
-public class JwtBearerAuthenticationMechanism implements HttpAuthenticationMechanism {
-  private static final String BEARER_PREFIX = "Bearer ";
+@Priority(2)
+public class JwtCookieAuthenticationMechanism implements HttpAuthenticationMechanism {
 
   @Override
   public Uni<SecurityIdentity> authenticate(
       RoutingContext context, IdentityProviderManager identityProviderManager) {
-    String authHeader = context.request().getHeader(HttpHeaders.AUTHORIZATION);
-
-    if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
+    var sessionCookie = context.request().getCookie("session");
+    if (sessionCookie == null || sessionCookie.getValue() == null) {
       return Uni.createFrom().nullItem();
     }
 
-    String token = authHeader.substring(BEARER_PREFIX.length());
-    if (token.isEmpty()) {
-      return Uni.createFrom().nullItem();
-    }
+    String token = sessionCookie.getValue();
     TokenAuthenticationRequest request =
         new TokenAuthenticationRequest(new TokenCredential(token, "JWT"));
     return identityProviderManager.authenticate(request);
+  }
+
+  @Override
+  public Uni<Boolean> sendChallenge(RoutingContext context) {
+    return Uni.createFrom().item(true);
+  }
+
+  @Override
+  public Set<Class<? extends AuthenticationRequest>> getCredentialTypes() {
+    return Collections.singleton(TokenAuthenticationRequest.class);
   }
 
   @Override
@@ -45,13 +50,8 @@ public class JwtBearerAuthenticationMechanism implements HttpAuthenticationMecha
         new ChallengeData(
             Response.Status.UNAUTHORIZED.getStatusCode(),
             HttpHeaders.WWW_AUTHENTICATE,
-            "Bearer realm=\"beachape-api\"");
+            "cookie; cookie-name=\"session\"");
 
     return Uni.createFrom().item(challenge);
-  }
-
-  @Override
-  public Set<Class<? extends AuthenticationRequest>> getCredentialTypes() {
-    return Collections.singleton(TokenAuthenticationRequest.class);
   }
 }

@@ -1,4 +1,4 @@
-package com.beachape.quiam.api.authentication;
+package com.beachape.quiam.app.authentication;
 
 import com.beachape.quiam.domain.jwt.JwtService;
 import io.quarkus.security.identity.AuthenticationRequestContext;

@@ -1,4 +1,4 @@
-package com.beachape.quiam.api.routes.users;
+package com.beachape.quiam.app.routes.users;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.validation.constraints.NotBlank;
