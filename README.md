@@ -22,9 +22,9 @@ Uses Java23
 * BouncyCastle FIPS
 * Domain-modelling-style organisation
 * Authentication:
-  * Creating Users w/ passwords and role assignments
-  * Getting an "API key" (JWT) back for a given user upon providing ^
-  * Returning role assignments for a given user upon presenting a valid API key
+  * Creating Users w/ passwords
+  * Getting a cookie + JWT back for a given user upon providing ^
+  * Returning user info when presented with cookie or bearer auth
 * OpenAPI
 * Creating a native executable
 
