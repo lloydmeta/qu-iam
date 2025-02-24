@@ -1,8 +1,7 @@
 package com.beachape.quiam.infra.users;
 
-import static com.beachape.quiam.domain.users.UsersService.*;
-
 import com.beachape.quiam.domain.users.UsersService;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Default;
 import java.util.Map;
@@ -16,6 +15,7 @@ public class InMemoryUsersService implements UsersService {
 
   private final Map<String, User> users = new ConcurrentHashMap<>();
 
+  @WithSpan
   @Override
   public void upsert(UpsertUser newUser) {
     String passwordHash = hasher.hashPassword(newUser.password());
@@ -23,6 +23,7 @@ public class InMemoryUsersService implements UsersService {
     users.put(user.name(), user);
   }
 
+  @WithSpan
   @Override
   public User authenticate(String name, String password) throws NoSuchUser, InvalidPassword {
     User retrievedUser = users.get(name);

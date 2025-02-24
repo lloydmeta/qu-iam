@@ -11,6 +11,8 @@ import io.smallrye.common.annotation.RunOnVirtualThread;
 import io.vertx.core.http.HttpServerRequest;
 import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -37,8 +39,7 @@ public class UsersResource {
 
   @POST
   @Path("/_upsert")
-  public Response upsertUser(DataTransferObjects.UpsertUserRequest request) {
-
+  public Response upsertUser(@Valid @NotNull DataTransferObjects.UpsertUserRequest request) {
     UpsertUser domainUser = new UpsertUser(request.username(), request.password());
     usersService.upsert(domainUser);
     return Response.ok(new DataTransferObjects.UpsertUserResponse("User upserted successfully"))
@@ -48,10 +49,9 @@ public class UsersResource {
   @POST
   @Path("/_login")
   @PermitAll
-  @Produces(MediaType.APPLICATION_JSON)
-  @Consumes(MediaType.APPLICATION_JSON)
-  public Response authenticate(
-      DataTransferObjects.AuthenticationRequest request, @Context HttpServerRequest serverRequest) {
+  public Response login(
+      @Valid @NotNull DataTransferObjects.AuthenticationRequest request,
+      @Context HttpServerRequest serverRequest) {
     try {
       User user = usersService.authenticate(request.username(), request.password());
       String token = jwtService.createToken(user.name());
@@ -81,7 +81,6 @@ public class UsersResource {
   @POST
   @Path("/_logout")
   @Authenticated
-  @Produces(MediaType.APPLICATION_JSON)
   @Consumes({MediaType.APPLICATION_JSON, MediaType.WILDCARD})
   public Response logout(
       @Context SecurityIdentity securityIdentity, @Context HttpServerRequest serverRequest) {
@@ -109,7 +108,6 @@ public class UsersResource {
   @GET
   @Path("/me")
   @Authenticated
-  @Produces(MediaType.APPLICATION_JSON)
   public Response getUser(@Context SecurityIdentity securityIdentity) {
     String username = securityIdentity.getPrincipal().getName();
     return Response.ok(new DataTransferObjects.UserResponse(username)).build();

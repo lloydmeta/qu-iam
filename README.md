@@ -26,6 +26,10 @@ Uses Java23
   * Getting a cookie + JWT back for a given user upon providing ^
   * Returning user info when presented with cookie or bearer auth
 * OpenAPI
+* o11y:
+  * metrics
+  * logs
+  * tracing
 * Creating a native executable
 
 ## Running the application in dev mode
@@ -89,3 +93,13 @@ If you want to learn more about building native executables, please consult <htt
 Easily start your REST Web Services
 
 [Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
+
+## OpenTelementry
+
+Set the OTel url and secrets in your env, then run, e.g.
+
+```sh
+export QUARKUS_OTEL_EXPORTER_OTLP_ENDPOINT="${OTEL_EXPORTER_OTLP_URL}"
+export QUARKUS_OTEL_EXPORTER_OTLP_HEADERS="authorization=Bearer ${OTEL_EXPORTER_OTLP_SECRET_TOKEN}"
+./gradlew quarkusDev
+```
