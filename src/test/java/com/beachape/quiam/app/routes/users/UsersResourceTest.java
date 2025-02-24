@@ -1,4 +1,4 @@
-package com.beachape.quiam.api.routes.users;
+package com.beachape.quiam.app.routes.users;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;

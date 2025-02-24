@@ -1,4 +1,4 @@
-package com.beachape.quiam.api.authentication;
+package com.beachape.quiam.app.authentication;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
