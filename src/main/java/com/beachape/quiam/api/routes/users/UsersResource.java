@@ -12,6 +12,7 @@ import io.vertx.core.http.HttpServerRequest;
 import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -38,7 +39,7 @@ public class UsersResource {
 
   @POST
   @Path("/_upsert")
-  public Response upsertUser(@Valid DataTransferObjects.UpsertUserRequest request) {
+  public Response upsertUser(@Valid @NotNull DataTransferObjects.UpsertUserRequest request) {
     UpsertUser domainUser = new UpsertUser(request.username(), request.password());
     usersService.upsert(domainUser);
     return Response.ok(new DataTransferObjects.UpsertUserResponse("User upserted successfully"))
@@ -49,7 +50,7 @@ public class UsersResource {
   @Path("/_login")
   @PermitAll
   public Response authenticate(
-      @Valid DataTransferObjects.AuthenticationRequest request,
+      @Valid @NotNull DataTransferObjects.AuthenticationRequest request,
       @Context HttpServerRequest serverRequest) {
     try {
       User user = usersService.authenticate(request.username(), request.password());
