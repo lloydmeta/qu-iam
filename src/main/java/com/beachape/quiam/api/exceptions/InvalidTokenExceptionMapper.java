@@ -1,7 +1,7 @@
 package com.beachape.quiam.api.exceptions;
 
 import com.beachape.quiam.api.authentication.JwtIdentityProvider.InvalidTokenException;
-import com.beachape.quiam.api.users.DataTransferObjects;
+import com.beachape.quiam.api.routes.users.DataTransferObjects;
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;

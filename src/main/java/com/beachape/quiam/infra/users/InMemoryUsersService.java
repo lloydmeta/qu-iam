@@ -1,7 +1,7 @@
 package com.beachape.quiam.infra.users;
 
-import com.beachape.quiam.domain.users.UpsertUser;
-import com.beachape.quiam.domain.users.User;
+import static com.beachape.quiam.domain.users.UsersService.*;
+
 import com.beachape.quiam.domain.users.UsersService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Default;

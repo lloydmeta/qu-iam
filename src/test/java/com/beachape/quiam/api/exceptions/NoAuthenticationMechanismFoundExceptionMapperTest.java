@@ -1,9 +1,10 @@
 package com.beachape.quiam.api.exceptions;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.beachape.quiam.api.authentication.LowestPriorityAuthenticationMechanism.*;
-import com.beachape.quiam.api.users.DataTransferObjects;
+import com.beachape.quiam.api.authentication.LowestPriorityAuthenticationMechanism.NoAuthenticationMechanismFoundException;
+import com.beachape.quiam.api.routes.users.DataTransferObjects;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;

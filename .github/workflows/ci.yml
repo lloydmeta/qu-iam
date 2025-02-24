@@ -40,7 +40,12 @@ jobs:
 
     - name: Build Native Image
       run: |
-        ./gradlew build -Dquarkus.native.enabled=true -Dquarkus.package.jar.enabled=false
+        ./gradlew build -Dquarkus.native.enabled=true -Dquarkus.package.jar.enabled=false -Dquarkus.native.additional-build-args='--emit build-report'
+      env:
+        GRAALVM_HOME: ${{ env.JAVA_HOME }}
+
+    - name: Run integration tests
+      run: ./gradlew quarkusIntTest
       env:
         GRAALVM_HOME: ${{ env.JAVA_HOME }}
 
@@ -56,7 +61,10 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: native-image-reports
-        path: build/reports/native-image/
+        path: |
+          build/**/*build-report.html
+          build/**/*build-output-stats.json
+          build/**/*build-artifacts.json
 
     - name: Cleanup Gradle Cache
       # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
