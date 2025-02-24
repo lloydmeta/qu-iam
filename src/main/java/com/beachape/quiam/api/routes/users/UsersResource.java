@@ -49,7 +49,7 @@ public class UsersResource {
   @POST
   @Path("/_login")
   @PermitAll
-  public Response authenticate(
+  public Response login(
       @Valid @NotNull DataTransferObjects.AuthenticationRequest request,
       @Context HttpServerRequest serverRequest) {
     try {

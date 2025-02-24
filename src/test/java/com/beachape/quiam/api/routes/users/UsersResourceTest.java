@@ -15,6 +15,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import jakarta.ws.rs.core.MediaType;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("NullAway")
 @QuarkusTest
 class UsersResourceTest {
 
@@ -308,5 +309,81 @@ class UsersResourceTest {
             .as(DataTransferObjects.ErrorResponse.class);
 
     assertEquals("Invalid token", response.error());
+  }
+
+  @Test
+  void upsertUser_shouldReturn400_whenRequestBodyIsMissing() {
+    given()
+        .contentType("application/json")
+        .when()
+        .post("/api/users/_upsert")
+        .then()
+        .statusCode(400)
+        .contentType("application/json");
+  }
+
+  @Test
+  void upsertUser_shouldReturn400_whenRequestBodyIsEmpty() {
+    given()
+        .contentType("application/json")
+        .body("{}")
+        .when()
+        .post("/api/users/_upsert")
+        .then()
+        .statusCode(400)
+        .contentType("application/json");
+  }
+
+  @Test
+  void login_shouldReturn400_whenRequestBodyIsMissing() {
+    given()
+        .contentType("application/json")
+        .when()
+        .post("/api/users/_login")
+        .then()
+        .statusCode(400)
+        .contentType("application/json");
+  }
+
+  @Test
+  void login_shouldReturn400_whenRequestBodyIsEmpty() {
+    given()
+        .contentType("application/json")
+        .body("{}")
+        .when()
+        .post("/api/users/_login")
+        .then()
+        .statusCode(400)
+        .contentType("application/json");
+  }
+
+  @Test
+  void login_shouldReturn400_whenUsernameIsMissing() {
+    DataTransferObjects.AuthenticationRequest request =
+        new DataTransferObjects.AuthenticationRequest(null, "password123");
+
+    given()
+        .contentType("application/json")
+        .body(request)
+        .when()
+        .post("/api/users/_login")
+        .then()
+        .statusCode(400)
+        .contentType("application/json");
+  }
+
+  @Test
+  void login_shouldReturn400_whenPasswordIsMissing() {
+    DataTransferObjects.AuthenticationRequest request =
+        new DataTransferObjects.AuthenticationRequest("testUser", null);
+
+    given()
+        .contentType("application/json")
+        .body(request)
+        .when()
+        .post("/api/users/_login")
+        .then()
+        .statusCode(400)
+        .contentType("application/json");
   }
 }
