@@ -68,13 +68,13 @@ The application, packaged as an _über-jar_, is now runnable using `java -jar bu
 You can create a native executable using:
 
 ```shell script
-./gradlew build -Dquarkus.native.enabled=true -Dquarkus.package.jar.enabled=false
+./gradlew build -Dquarkus.native.enabled=true -Dquarkus.package.jar.enabled=false -Dquarkus.native.additional-build-args='--emit build-report'
 ```
 
-Or, if you don't have GraalVM installed (`❯ brew install --cask graalvm-jdk`), you can run the native executable build in a container using:
+Or, if you don't have GraalVM installed (`brew install --cask graalvm-jdk` will do it on Mac), you can run the native executable build in a container using:
 
 ```shell script
-./gradlew build -Dquarkus.native.enabled=true -Dquarkus.native.container-build=true -Dquarkus.package.jar.enabled=false
+./gradlew build -Dquarkus.native.enabled=true -Dquarkus.native.container-build=true -Dquarkus.package.jar.enabled=false -Dquarkus.native.additional-build-args='--emit build-report'
 ```
 
 You can then execute your native executable with: `./build/qu-iam-1.0.0-SNAPSHOT-runner`

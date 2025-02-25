@@ -9,10 +9,10 @@ public interface UsersService {
   public User authenticate(String name, String password) throws NoSuchUser, InvalidPassword;
 
   // Domain errors
-  public static class NoSuchUser extends RuntimeException {}
+  public static class NoSuchUser extends Exception {}
   ;
 
-  public static class InvalidPassword extends RuntimeException {}
+  public static class InvalidPassword extends Exception {}
   ;
 
   public static record User(String name, String passwordHash) {}

@@ -23,7 +23,7 @@ class InMemoryUsersServiceTest {
   }
 
   @Test
-  void upsert_shouldStoreNewUser() {
+  void upsert_shouldStoreNewUser() throws Exception {
     // Given
     UpsertUser newUser = new UpsertUser(USERNAME, PASSWORD);
 
@@ -36,7 +36,7 @@ class InMemoryUsersServiceTest {
   }
 
   @Test
-  void upsert_shouldUpdateExistingUser() {
+  void upsert_shouldUpdateExistingUser() throws Exception {
     // Given
     String oldPassword = "oldPassword123!";
     String newPassword = "newPassword123!";
@@ -53,12 +53,12 @@ class InMemoryUsersServiceTest {
   }
 
   @Test
-  void authenticate_shouldThrowNoSuchUser_whenUserDoesNotExist() {
+  void authenticate_shouldThrowNoSuchUser_whenUserDoesNotExist() throws Exception {
     assertThrows(NoSuchUser.class, () -> service.authenticate("nonexistentUser", PASSWORD));
   }
 
   @Test
-  void authenticate_shouldThrowInvalidPassword_whenPasswordIsIncorrect() {
+  void authenticate_shouldThrowInvalidPassword_whenPasswordIsIncorrect() throws Exception {
     // Given
     service.upsert(new UpsertUser(USERNAME, PASSWORD));
 
@@ -67,7 +67,7 @@ class InMemoryUsersServiceTest {
   }
 
   @Test
-  void authenticate_shouldReturnUser_whenCredentialsAreValid() {
+  void authenticate_shouldReturnUser_whenCredentialsAreValid() throws Exception {
     // Given
     service.upsert(new UpsertUser(USERNAME, PASSWORD));
 
@@ -80,7 +80,7 @@ class InMemoryUsersServiceTest {
   }
 
   @Test
-  void authenticate_shouldSucceed_withMultipleUsers() {
+  void authenticate_shouldSucceed_withMultipleUsers() throws Exception {
     // Given
     String user1 = "user1";
     String pass1 = "pass1";
@@ -99,7 +99,8 @@ class InMemoryUsersServiceTest {
   }
 
   @Test
-  void authenticate_shouldThrowInvalidPassword_forWrongPasswordWithValidUsername() {
+  void authenticate_shouldThrowInvalidPassword_forWrongPasswordWithValidUsername()
+      throws Exception {
     // Given
     service.upsert(new UpsertUser(USERNAME, PASSWORD));
 

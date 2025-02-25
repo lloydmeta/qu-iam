@@ -80,7 +80,7 @@ class UsersResourceTest {
   }
 
   @Test
-  void authenticate_shouldReturn404_whenUserNotFound() {
+  void authenticate_shouldReturn404_whenUserNotFound() throws Exception {
     // Given
     DataTransferObjects.AuthenticationRequest request =
         new DataTransferObjects.AuthenticationRequest("testUser", "password123");
@@ -103,7 +103,7 @@ class UsersResourceTest {
   }
 
   @Test
-  void authenticate_shouldReturn401_whenPasswordInvalid() {
+  void authenticate_shouldReturn401_whenPasswordInvalid() throws Exception {
     // Given
     DataTransferObjects.AuthenticationRequest request =
         new DataTransferObjects.AuthenticationRequest("testUser", "password123");

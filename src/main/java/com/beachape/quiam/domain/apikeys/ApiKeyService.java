@@ -8,5 +8,5 @@ public interface ApiKeyService {
 
   String validateApiKey(String apiKey) throws ApiKeyNotFoundException;
 
-  public class ApiKeyNotFoundException extends RuntimeException {}
+  public class ApiKeyNotFoundException extends Exception {}
 }
