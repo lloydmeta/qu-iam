@@ -1,5 +1,5 @@
 # qu-iam
-[![CI](https://github.com/lloydmeta/qu-iam/actions/workflows/ci.yml/badge.svg)](https://github.com/lloydmeta/qu-iam/actions/workflows/ci.yml) 
+[![CI](https://github.com/lloydmeta/qu-iam/actions/workflows/ci.yml/badge.svg)](https://github.com/lloydmeta/qu-iam/actions/workflows/ci.yml)
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
@@ -68,13 +68,20 @@ The application, packaged as an _über-jar_, is now runnable using `java -jar bu
 You can create a native executable using:
 
 ```shell script
-./gradlew build -Dquarkus.native.enabled=true -Dquarkus.package.jar.enabled=false -Dquarkus.native.additional-build-args='--emit build-report'
+./gradlew build \
+  -Dquarkus.native.enabled=true \
+  -Dquarkus.package.jar.enabled=false \
+  -Dquarkus.native.additional-build-args='--emit build-report'
 ```
 
 Or, if you don't have GraalVM installed (`brew install --cask graalvm-jdk` will do it on Mac), you can run the native executable build in a container using:
 
 ```shell script
-./gradlew build -Dquarkus.native.enabled=true -Dquarkus.native.container-build=true -Dquarkus.package.jar.enabled=false -Dquarkus.native.additional-build-args='--emit build-report'
+./gradlew build \
+  -Dquarkus.native.enabled=true \
+  -Dquarkus.package.jar.enabled=false \
+  -Dquarkus.native.container-build=true \
+  -Dquarkus.native.builder-image=quay.io/quarkus/ubi-quarkus-mandrel-builder-image:jdk-23
 ```
 
 You can then execute your native executable with: `./build/qu-iam-1.0.0-SNAPSHOT-runner`
