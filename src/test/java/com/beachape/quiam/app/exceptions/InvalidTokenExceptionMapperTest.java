@@ -3,7 +3,7 @@ package com.beachape.quiam.app.exceptions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.beachape.quiam.app.authentication.JwtIdentityProvider;
-import com.beachape.quiam.app.routes.users.DataTransferObjects;
+import com.beachape.quiam.app.routes.users.ApiModels;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
@@ -25,8 +25,7 @@ class InvalidTokenExceptionMapperTest {
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
     assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
 
-    DataTransferObjects.ErrorResponse errorResponse =
-        (DataTransferObjects.ErrorResponse) response.getEntity();
+    ApiModels.ErrorResponse errorResponse = (ApiModels.ErrorResponse) response.getEntity();
     assertEquals("Test error message", errorResponse.error());
   }
 
@@ -43,8 +42,7 @@ class InvalidTokenExceptionMapperTest {
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
     assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
 
-    DataTransferObjects.ErrorResponse errorResponse =
-        (DataTransferObjects.ErrorResponse) response.getEntity();
+    ApiModels.ErrorResponse errorResponse = (ApiModels.ErrorResponse) response.getEntity();
     assertEquals("Invalid token", errorResponse.error());
   }
 
@@ -62,8 +60,7 @@ class InvalidTokenExceptionMapperTest {
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
     assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
 
-    DataTransferObjects.ErrorResponse errorResponse =
-        (DataTransferObjects.ErrorResponse) response.getEntity();
+    ApiModels.ErrorResponse errorResponse = (ApiModels.ErrorResponse) response.getEntity();
     assertEquals("Test error message", errorResponse.error());
   }
 }

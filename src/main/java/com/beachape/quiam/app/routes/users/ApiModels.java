@@ -5,8 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 @RegisterForReflection // So that they can work with the native image
-public final class DataTransferObjects {
-  private DataTransferObjects() {} // Prevent instantiation
+public final class ApiModels {
+  private ApiModels() {} // Prevent instantiation
 
   public static record UpsertUserRequest(
       @NotBlank @Schema(example = "lloyd") String username,

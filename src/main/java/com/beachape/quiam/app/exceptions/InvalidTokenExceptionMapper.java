@@ -1,7 +1,7 @@
 package com.beachape.quiam.app.exceptions;
 
 import com.beachape.quiam.app.authentication.JwtIdentityProvider.InvalidTokenException;
-import com.beachape.quiam.app.routes.users.DataTransferObjects;
+import com.beachape.quiam.app.routes.users.ApiModels;
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -20,7 +20,7 @@ public class InvalidTokenExceptionMapper implements ExceptionMapper<InvalidToken
     String message = exception.getMessage() != null ? exception.getMessage() : "Invalid token";
     return Response.status(Response.Status.UNAUTHORIZED)
         .type(MediaType.APPLICATION_JSON)
-        .entity(new DataTransferObjects.ErrorResponse(message))
+        .entity(new ApiModels.ErrorResponse(message))
         .build();
   }
 }

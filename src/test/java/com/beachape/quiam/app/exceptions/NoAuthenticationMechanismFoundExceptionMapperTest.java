@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.beachape.quiam.app.authentication.LowestPriorityAuthenticationMechanism.*;
 import com.beachape.quiam.app.authentication.LowestPriorityAuthenticationMechanism.NoAuthenticationMechanismFoundException;
-import com.beachape.quiam.app.routes.users.DataTransferObjects;
+import com.beachape.quiam.app.routes.users.ApiModels;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
@@ -26,8 +26,7 @@ class NoAuthenticationMechanismFoundExceptionMapperTest {
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
     assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
 
-    DataTransferObjects.ErrorResponse errorResponse =
-        (DataTransferObjects.ErrorResponse) response.getEntity();
+    ApiModels.ErrorResponse errorResponse = (ApiModels.ErrorResponse) response.getEntity();
     assertEquals("Invalid session", errorResponse.error());
   }
 
@@ -44,8 +43,7 @@ class NoAuthenticationMechanismFoundExceptionMapperTest {
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
     assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
 
-    DataTransferObjects.ErrorResponse errorResponse =
-        (DataTransferObjects.ErrorResponse) response.getEntity();
+    ApiModels.ErrorResponse errorResponse = (ApiModels.ErrorResponse) response.getEntity();
     assertEquals("Custom error message", errorResponse.error());
   }
 }

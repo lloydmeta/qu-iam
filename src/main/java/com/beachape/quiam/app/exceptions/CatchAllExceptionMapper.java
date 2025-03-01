@@ -1,6 +1,6 @@
 package com.beachape.quiam.app.exceptions;
 
-import com.beachape.quiam.app.routes.users.DataTransferObjects;
+import com.beachape.quiam.app.routes.users.ApiModels;
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -17,7 +17,7 @@ public class CatchAllExceptionMapper implements ExceptionMapper<Throwable> {
 
     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
         .type(MediaType.APPLICATION_JSON)
-        .entity(new DataTransferObjects.ErrorResponse(message))
+        .entity(new ApiModels.ErrorResponse(message))
         .build();
   }
 }

@@ -30,12 +30,12 @@ class UsersResourceTest {
   @Test
   void upsertUser_shouldReturnSuccessMessage_whenSuccessful() {
     // Given
-    DataTransferObjects.UpsertUserRequest request =
-        new DataTransferObjects.UpsertUserRequest("testUser", "password123");
+    ApiModels.UpsertUserRequest request =
+        new ApiModels.UpsertUserRequest("testUser", "password123");
     UpsertUser domainUser = new UpsertUser("testUser", "password123");
 
     // When
-    DataTransferObjects.UpsertUserResponse response =
+    ApiModels.UpsertUserResponse response =
         given()
             .contentType("application/json")
             .body(request)
@@ -44,19 +44,18 @@ class UsersResourceTest {
             .then()
             .statusCode(200)
             .extract()
-            .as(DataTransferObjects.UpsertUserResponse.class);
+            .as(ApiModels.UpsertUserResponse.class);
 
     // Then
-    assertEquals(
-        new DataTransferObjects.UpsertUserResponse("User upserted successfully"), response);
+    assertEquals(new ApiModels.UpsertUserResponse("User upserted successfully"), response);
     verify(usersService).upsert(domainUser);
   }
 
   @Test
   void authenticate_shouldReturnTokenAndSetCookie_whenCredentialsValid() throws Exception {
     // Given
-    DataTransferObjects.AuthenticationRequest request =
-        new DataTransferObjects.AuthenticationRequest("testUser", "password123");
+    ApiModels.AuthenticationRequest request =
+        new ApiModels.AuthenticationRequest("testUser", "password123");
     when(usersService.authenticate("testUser", "password123"))
         .thenReturn(new User("testUser", "hashedPassword"));
     when(jwtService.createToken("testUser")).thenReturn("jwt-token-123");
@@ -73,8 +72,8 @@ class UsersResourceTest {
 
     // Then
     response.cookie("session", "jwt-token-123");
-    DataTransferObjects.AuthenticationResponse authResponse =
-        response.extract().as(DataTransferObjects.AuthenticationResponse.class);
+    ApiModels.AuthenticationResponse authResponse =
+        response.extract().as(ApiModels.AuthenticationResponse.class);
     assertEquals("testUser", authResponse.username());
     assertEquals("jwt-token-123", authResponse.token());
   }
@@ -82,13 +81,13 @@ class UsersResourceTest {
   @Test
   void authenticate_shouldReturn404_whenUserNotFound() throws Exception {
     // Given
-    DataTransferObjects.AuthenticationRequest request =
-        new DataTransferObjects.AuthenticationRequest("testUser", "password123");
+    ApiModels.AuthenticationRequest request =
+        new ApiModels.AuthenticationRequest("testUser", "password123");
     when(usersService.authenticate("testUser", "password123"))
         .thenThrow(new UsersService.NoSuchUser());
 
     // When/Then
-    DataTransferObjects.ErrorResponse response =
+    ApiModels.ErrorResponse response =
         given()
             .contentType("application/json")
             .body(request)
@@ -97,7 +96,7 @@ class UsersResourceTest {
             .then()
             .statusCode(404)
             .extract()
-            .as(DataTransferObjects.ErrorResponse.class);
+            .as(ApiModels.ErrorResponse.class);
 
     assertEquals("User not found", response.error());
   }
@@ -105,13 +104,13 @@ class UsersResourceTest {
   @Test
   void authenticate_shouldReturn401_whenPasswordInvalid() throws Exception {
     // Given
-    DataTransferObjects.AuthenticationRequest request =
-        new DataTransferObjects.AuthenticationRequest("testUser", "password123");
+    ApiModels.AuthenticationRequest request =
+        new ApiModels.AuthenticationRequest("testUser", "password123");
     when(usersService.authenticate("testUser", "password123"))
         .thenThrow(new UsersService.InvalidPassword());
 
     // When/Then
-    DataTransferObjects.ErrorResponse response =
+    ApiModels.ErrorResponse response =
         given()
             .contentType("application/json")
             .body(request)
@@ -120,7 +119,7 @@ class UsersResourceTest {
             .then()
             .statusCode(401)
             .extract()
-            .as(DataTransferObjects.ErrorResponse.class);
+            .as(ApiModels.ErrorResponse.class);
 
     assertEquals("Invalid password", response.error());
   }
@@ -149,7 +148,7 @@ class UsersResourceTest {
         .invalidateToken("invalid-token");
 
     // When/Then
-    DataTransferObjects.ErrorResponse response =
+    ApiModels.ErrorResponse response =
         given()
             .cookie("session", "invalid-token")
             .when()
@@ -157,7 +156,7 @@ class UsersResourceTest {
             .then()
             .statusCode(401)
             .extract()
-            .as(DataTransferObjects.ErrorResponse.class);
+            .as(ApiModels.ErrorResponse.class);
 
     assertEquals("Invalid session token", response.error());
   }
@@ -173,7 +172,7 @@ class UsersResourceTest {
   @Test
   void getUser_shouldReturn401_whenNoToken() {
     // When/Then
-    DataTransferObjects.ErrorResponse response =
+    ApiModels.ErrorResponse response =
         given()
             .when()
             .get("/api/users/me")
@@ -181,7 +180,7 @@ class UsersResourceTest {
             .statusCode(401)
             .contentType("application/json")
             .extract()
-            .as(DataTransferObjects.ErrorResponse.class);
+            .as(ApiModels.ErrorResponse.class);
 
     assertEquals("No authentication mechanism found", response.error());
   }
@@ -194,7 +193,7 @@ class UsersResourceTest {
         .validateToken("invalid-token");
 
     // When/Then
-    DataTransferObjects.ErrorResponse response =
+    ApiModels.ErrorResponse response =
         given()
             .cookie("session", "invalid-token")
             .when()
@@ -202,7 +201,7 @@ class UsersResourceTest {
             .then()
             .statusCode(401)
             .extract()
-            .as(DataTransferObjects.ErrorResponse.class);
+            .as(ApiModels.ErrorResponse.class);
 
     assertEquals("Invalid token", response.error());
   }
@@ -216,16 +215,16 @@ class UsersResourceTest {
     when(jwtService.validateToken("valid-token")).thenReturn("test-user");
 
     // First authenticate to get the token
-    DataTransferObjects.AuthenticationResponse authResponse =
+    ApiModels.AuthenticationResponse authResponse =
         given()
             .contentType(MediaType.APPLICATION_JSON)
-            .body(new DataTransferObjects.AuthenticationRequest("test-user", "test-pass"))
+            .body(new ApiModels.AuthenticationRequest("test-user", "test-pass"))
             .when()
             .post("/api/users/_login")
             .then()
             .statusCode(200)
             .extract()
-            .as(DataTransferObjects.AuthenticationResponse.class);
+            .as(ApiModels.AuthenticationResponse.class);
 
     // Then use the token in Authorization header
     given()
@@ -244,7 +243,7 @@ class UsersResourceTest {
         .validateToken("invalid-token");
 
     // When/Then
-    DataTransferObjects.ErrorResponse response =
+    ApiModels.ErrorResponse response =
         given()
             .header("Authorization", "Bearer invalid-token")
             .when()
@@ -253,7 +252,7 @@ class UsersResourceTest {
             .statusCode(401)
             .contentType(MediaType.APPLICATION_JSON)
             .extract()
-            .as(DataTransferObjects.ErrorResponse.class);
+            .as(ApiModels.ErrorResponse.class);
 
     assertEquals("Invalid token", response.error());
   }
@@ -267,16 +266,16 @@ class UsersResourceTest {
     when(jwtService.validateToken("valid-token")).thenReturn("test-user");
 
     // First authenticate to get the token
-    DataTransferObjects.AuthenticationResponse authResponse =
+    ApiModels.AuthenticationResponse authResponse =
         given()
             .contentType(MediaType.APPLICATION_JSON)
-            .body(new DataTransferObjects.AuthenticationRequest("test-user", "test-pass"))
+            .body(new ApiModels.AuthenticationRequest("test-user", "test-pass"))
             .when()
             .post("/api/users/_login")
             .then()
             .statusCode(200)
             .extract()
-            .as(DataTransferObjects.AuthenticationResponse.class);
+            .as(ApiModels.AuthenticationResponse.class);
 
     // Then use the token in Authorization header for logout
     given()
@@ -297,7 +296,7 @@ class UsersResourceTest {
         .validateToken("invalid-token");
 
     // When/Then
-    DataTransferObjects.ErrorResponse response =
+    ApiModels.ErrorResponse response =
         given()
             .header("Authorization", "Bearer invalid-token")
             .when()
@@ -306,7 +305,7 @@ class UsersResourceTest {
             .statusCode(401)
             .contentType(MediaType.APPLICATION_JSON)
             .extract()
-            .as(DataTransferObjects.ErrorResponse.class);
+            .as(ApiModels.ErrorResponse.class);
 
     assertEquals("Invalid token", response.error());
   }
@@ -359,8 +358,8 @@ class UsersResourceTest {
 
   @Test
   void login_shouldReturn400_whenUsernameIsMissing() {
-    DataTransferObjects.AuthenticationRequest request =
-        new DataTransferObjects.AuthenticationRequest(null, "password123");
+    ApiModels.AuthenticationRequest request =
+        new ApiModels.AuthenticationRequest(null, "password123");
 
     given()
         .contentType("application/json")
@@ -374,8 +373,7 @@ class UsersResourceTest {
 
   @Test
   void login_shouldReturn400_whenPasswordIsMissing() {
-    DataTransferObjects.AuthenticationRequest request =
-        new DataTransferObjects.AuthenticationRequest("testUser", null);
+    ApiModels.AuthenticationRequest request = new ApiModels.AuthenticationRequest("testUser", null);
 
     given()
         .contentType("application/json")

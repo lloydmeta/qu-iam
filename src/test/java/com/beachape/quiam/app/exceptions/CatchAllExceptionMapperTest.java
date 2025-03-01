@@ -2,7 +2,7 @@ package com.beachape.quiam.app.exceptions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.beachape.quiam.app.routes.users.DataTransferObjects;
+import com.beachape.quiam.app.routes.users.ApiModels;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
@@ -22,8 +22,7 @@ class CatchAllExceptionMapperTest {
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
     assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
 
-    DataTransferObjects.ErrorResponse errorResponse =
-        (DataTransferObjects.ErrorResponse) response.getEntity();
+    ApiModels.ErrorResponse errorResponse = (ApiModels.ErrorResponse) response.getEntity();
     assertEquals("Test error message", errorResponse.error());
   }
 
@@ -39,8 +38,7 @@ class CatchAllExceptionMapperTest {
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
     assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
 
-    DataTransferObjects.ErrorResponse errorResponse =
-        (DataTransferObjects.ErrorResponse) response.getEntity();
+    ApiModels.ErrorResponse errorResponse = (ApiModels.ErrorResponse) response.getEntity();
     assertEquals("Server side internal exception", errorResponse.error());
   }
 
@@ -56,8 +54,7 @@ class CatchAllExceptionMapperTest {
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
     assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
 
-    DataTransferObjects.ErrorResponse errorResponse =
-        (DataTransferObjects.ErrorResponse) response.getEntity();
+    ApiModels.ErrorResponse errorResponse = (ApiModels.ErrorResponse) response.getEntity();
     assertEquals("Test error", errorResponse.error());
   }
 }

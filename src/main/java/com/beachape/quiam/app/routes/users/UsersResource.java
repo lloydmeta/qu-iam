@@ -1,7 +1,7 @@
 package com.beachape.quiam.app.routes.users;
 
 import com.beachape.quiam.app.authentication.JwtIdentityProvider;
-import com.beachape.quiam.app.routes.users.DataTransferObjects.*;
+import com.beachape.quiam.app.routes.users.ApiModels.*;
 import com.beachape.quiam.domain.jwt.JwtService;
 import com.beachape.quiam.domain.users.UsersService;
 import com.beachape.quiam.domain.users.UsersService.UpsertUser;
