@@ -53,8 +53,7 @@ public class UsersResource {
   @APIResponseSchema(value = AuthenticationResponse.class)
   @PermitAll
   public Response login(
-      @Valid @NotNull DataTransferObjects.AuthenticationRequest request,
-      @Context HttpServerRequest serverRequest) {
+      @Valid @NotNull AuthenticationRequest request, @Context HttpServerRequest serverRequest) {
     try {
       User user = usersService.authenticate(request.username(), request.password());
       String token = jwtService.createToken(user.name());
@@ -67,18 +66,18 @@ public class UsersResource {
               .secure(serverRequest.isSSL())
               .build();
 
-      return Response.ok(new DataTransferObjects.AuthenticationResponse(user.name(), token))
+      return Response.ok(new AuthenticationResponse(user.name(), token))
           .cookie(sessionCookie)
           .build();
     } catch (UsersService.NoSuchUser e) {
       throw new WebApplicationException(
           Response.status(Response.Status.NOT_FOUND)
-              .entity(new DataTransferObjects.ErrorResponse("User not found"))
+              .entity(new ErrorResponse("User not found"))
               .build());
     } catch (UsersService.InvalidPassword e) {
       throw new WebApplicationException(
           Response.status(Response.Status.UNAUTHORIZED)
-              .entity(new DataTransferObjects.ErrorResponse("Invalid password"))
+              .entity(new ErrorResponse("Invalid password"))
               .build());
     }
   }
@@ -106,7 +105,7 @@ public class UsersResource {
     } catch (JwtService.TokenValidationException e) {
       throw new WebApplicationException(
           Response.status(Response.Status.UNAUTHORIZED)
-              .entity(new DataTransferObjects.ErrorResponse("Invalid session token"))
+              .entity(new ErrorResponse("Invalid session token"))
               .build());
     }
   }
