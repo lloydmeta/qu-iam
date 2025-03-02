@@ -115,6 +115,7 @@ dependencyCheck {
             enabled = false
         }
         
+        archiveEnabled = false
         // Keep Java analyzers enabled
         jarEnabled = true
         centralEnabled = true
