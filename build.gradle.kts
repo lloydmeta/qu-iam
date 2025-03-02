@@ -74,10 +74,16 @@ tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
     options.compilerArgs.addAll(listOf(
         "-parameters", 
+        "-Xlint:all",
+        // Things we don't control anyway
+        "-Xlint:-serial",
+        "-Xlint:-classfile",
+        // Throw on warnings
         "-Werror"
     ))
 
     options.errorprone {
+        allErrorsAsWarnings.set(false)
         option("NullAway:AnnotatedPackages", "com.beachape")
         option("disableWarningsInGeneratedCode", "true")
         error("NullAway")

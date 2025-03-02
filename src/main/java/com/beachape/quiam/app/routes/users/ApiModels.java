@@ -9,14 +9,14 @@ public final class ApiModels {
   private ApiModels() {} // Prevent instantiation
 
   public static record UpsertUserRequest(
-      @NotBlank @Schema(example = "lloyd") String username,
-      @NotBlank @Schema(example = "passw0rd") String password) {}
+      @NotBlank @Schema(examples = {"lloyd"}) String username,
+      @NotBlank @Schema(examples = {"passw0rd"}) String password) {}
 
   public static record UpsertUserResponse(String message) {}
 
   public static record AuthenticationRequest(
-      @NotBlank @Schema(example = "lloyd") String username,
-      @NotBlank @Schema(example = "passw0rd") String password) {}
+      @NotBlank @Schema(examples = {"lloyd"}) String username,
+      @NotBlank @Schema(examples = {"passw0rd"}) String password) {}
 
   public static record AuthenticationResponse(String username, String token) {}
 
