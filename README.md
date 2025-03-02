@@ -31,6 +31,8 @@ Uses Java23
   * logs
   * tracing
 * Creating a native executable
+* Static analysis
+* Security scanning
 
 ## Running the application in dev mode
 

@@ -5,6 +5,7 @@ plugins {
     id("io.quarkus")
     id("com.diffplug.spotless") version "7.0.2"
     id("net.ltgt.errorprone") version "4.1.0"
+    id("org.owasp.dependencycheck") version "12.1.0"
 }
 
 repositories {
@@ -88,4 +89,41 @@ tasks.withType<JavaCompile>().configureEach {
         option("disableWarningsInGeneratedCode", "true")
         error("NullAway")
     }
+}
+
+dependencyCheck {
+    failBuildOnCVSS = 7.0f
+    formats = listOf("HTML", "SARIF")
+
+    // Skip non-Java dependencies
+    analyzers {
+        // Disable all non-Java analyzers
+        assemblyEnabled = false
+        nodeEnabled = false
+        rubygemsEnabled = false
+        pyDistributionEnabled = false
+        pyPackageEnabled = false
+        nuspecEnabled = false
+        nugetconfEnabled = false
+        cmakeEnabled = false
+        autoconfEnabled = false
+        composerEnabled = false
+        nodeAudit {
+            enabled = false
+        }
+        retirejs {
+            enabled = false
+        }
+        
+        // Keep Java analyzers enabled
+        jarEnabled = true
+        centralEnabled = true
+        nexusEnabled = true
+        
+        // Optional: Enable Maven analyzers if you use Maven dependencies
+        centralEnabled = true
+    }
+    
+    // Skip test dependencies if you want to focus only on runtime dependencies
+    skipConfigurations = listOf("testImplementation", "testRuntimeOnly", "testCompileOnly")
 }
