@@ -119,9 +119,6 @@ dependencyCheck {
         jarEnabled = true
         centralEnabled = true
         nexusEnabled = true
-        
-        // Optional: Enable Maven analyzers if you use Maven dependencies
-        centralEnabled = true
     }
     
     // Skip test dependencies if you want to focus only on runtime dependencies
