@@ -1,0 +1,7 @@
+ <FindBugsFilter>
+    <!-- Suppressions for specific bug patterns -->
+    <Match>
+        <Method name="init"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+</FindBugsFilter>

@@ -5,6 +5,7 @@ plugins {
     id("io.quarkus")
     id("com.diffplug.spotless") version "7.0.2"
     id("net.ltgt.errorprone") version "4.1.0"
+    id("com.github.spotbugs") version "6.1.7"
 }
 
 repositories {
@@ -18,11 +19,10 @@ val quarkusPlatformVersion: String by project
 
 dependencies {
     implementation("io.quarkus:quarkus-hibernate-validator")
-    implementation("io.quarkus:quarkus-logging-json")
     implementation("io.quarkus:quarkus-opentelemetry")
     implementation("io.quarkus:quarkus-smallrye-jwt")
     implementation("io.quarkus:quarkus-smallrye-openapi")
-    implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
+    implementation(enforcedPlatform("$quarkusPlatformGroupId:$quarkusPlatformArtifactId:$quarkusPlatformVersion"))
     implementation("io.quarkus:quarkus-rest")
     implementation("io.quarkus:quarkus-rest-jackson")
     implementation("io.quarkus:quarkus-arc")
@@ -38,7 +38,6 @@ dependencies {
     // Static Analysis
     errorprone("com.google.errorprone:error_prone_core:2.36.0")
     errorprone("com.uber.nullaway:nullaway:0.10.24")
-
 }
 
 group = "com.beachape"
@@ -61,31 +60,75 @@ spotless {
         // Exclude generated sources
         targetExclude(
             "**/generated/**",
-            "**/build/**"
+            "**/build/**",
         )
+    }
+
+    // Format Gradle Kotlin DSL files
+    kotlinGradle {
+        ktlint()
     }
 }
 
+spotbugs {
+    ignoreFailures.set(false) // Fail build on SpotBugs errors
+    showProgress.set(true)
+    includeFilter.set(project.file("spotbugs-filter.xml"))
+}
+
+// Configure build to fail if spotless checks fail
+gradle.startParameter.isContinueOnFailure = false
 
 tasks.withType<Test> {
     systemProperty("java.util.logging.manager", "org.jboss.logmanager.LogManager")
 }
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
-    options.compilerArgs.addAll(listOf(
-        "-parameters", 
-        "-Xlint:all",
-        // Things we don't control anyway
-        "-Xlint:-serial",
-        "-Xlint:-classfile",
-        // Throw on warnings
-        "-Werror"
-    ))
+    options.compilerArgs.addAll(
+        listOf(
+            "-parameters",
+            "-Xlint:all",
+            // Things we don't control anyway
+            "-Xlint:-serial",
+            "-Xlint:-classfile",
+            // Throw on warnings
+            "-Werror",
+        ),
+    )
 
     options.errorprone {
         allErrorsAsWarnings.set(false)
         option("NullAway:AnnotatedPackages", "com.beachape")
         option("disableWarningsInGeneratedCode", "true")
+
+        // Additional Error Prone checks for safer code
         error("NullAway")
+        error("MissingOverride")
+        error("ImmutableEnumChecker")
+        error("InputStreamSlowMultibyteRead")
+        error("InvalidInlineTag")
+        error("InvalidParam")
+        error("MissingCasesInEnumSwitch")
+        error("MissingFail")
+        error("NonAtomicVolatileUpdate")
+        error("NonCanonicalStaticImport")
+        error("NonCanonicalStaticMemberImport")
+        error("UnnecessaryStaticImport")
+        error("WaitNotInLoop")
+        error("EqualsHashCode")
+        error("ClassCanBeStatic")
+        error("FutureReturnValueIgnored")
     }
+}
+
+// Add a verification task to check all code quality issues
+tasks.register("verifyCodeQuality") {
+    group = "verification"
+    description = "Runs all code quality checks"
+    dependsOn("spotlessCheck", "spotbugsMain")
+}
+
+// Make the build task depend on code quality checks
+tasks.named("build") {
+    dependsOn("verifyCodeQuality")
 }

@@ -5,6 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Default;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
@@ -32,7 +33,7 @@ public class RegenOnAppStartAsymmetricKeysManager implements AsymmetricKeysManag
       KeyPair pair = keyGen.generateKeyPair();
       this.privateKey = pair.getPrivate();
       this.publicKey = pair.getPublic();
-    } catch (Exception e) {
+    } catch (NoSuchAlgorithmException e) {
       throw new RuntimeException("Failed to generate key pair", e);
     }
   }

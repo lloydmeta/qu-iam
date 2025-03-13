@@ -16,7 +16,7 @@ public class InMemoryJwtService implements JwtService {
   private final AsymmetricKeysManager keysManager;
   private final JWTParser parser;
 
-  public final String ApiKeyClaim = "api_key";
+  public static final String ApiKeyClaim = "api_key";
 
   @Inject
   public InMemoryJwtService(
