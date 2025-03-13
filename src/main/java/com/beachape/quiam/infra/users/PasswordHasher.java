@@ -66,6 +66,11 @@ final class PasswordHasher {
       spec.clearPassword();
 
       return constantTimeEquals(expectedHash, actualHash);
+    } catch (NumberFormatException
+        | NoSuchAlgorithmException
+        | NoSuchProviderException
+        | InvalidKeySpecException e) {
+      return false;
     } catch (Exception e) {
       return false;
     }
