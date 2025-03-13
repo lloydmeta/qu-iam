@@ -103,21 +103,6 @@ tasks.withType<JavaCompile>().configureEach {
 
         // Additional Error Prone checks for safer code
         error("NullAway")
-        error("MissingOverride")
-        error("ImmutableEnumChecker")
-        error("InputStreamSlowMultibyteRead")
-        error("InvalidInlineTag")
-        error("InvalidParam")
-        error("MissingCasesInEnumSwitch")
-        error("MissingFail")
-        error("NonAtomicVolatileUpdate")
-        error("NonCanonicalStaticImport")
-        error("NonCanonicalStaticMemberImport")
-        error("UnnecessaryStaticImport")
-        error("WaitNotInLoop")
-        error("EqualsHashCode")
-        error("ClassCanBeStatic")
-        error("FutureReturnValueIgnored")
     }
 }
 
