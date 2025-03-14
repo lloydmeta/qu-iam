@@ -19,7 +19,7 @@ public class InMemoryUsersService implements UsersService {
   @Override
   public void upsert(UpsertUser newUser) {
     String passwordHash = hasher.hashPassword(newUser.password());
-    User user = new User(newUser.name(), passwordHash);
+    User user = User.builder().name(newUser.username()).passwordHash(passwordHash).build();
     users.put(user.name(), user);
   }
 

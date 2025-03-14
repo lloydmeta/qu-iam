@@ -17,6 +17,10 @@ val quarkusPlatformGroupId: String by project
 val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
 
+val mapstructVersion = "1.6.3"
+val lombokVersion = "1.18.36"
+val lombokMapstructBindingVersion = "0.2.0"
+
 dependencies {
     implementation("io.quarkus:quarkus-hibernate-validator")
     implementation("io.quarkus:quarkus-opentelemetry")
@@ -35,9 +39,22 @@ dependencies {
     // https://mvnrepository.com/artifact/io.quarkus/quarkus-junit5-mockito
     testImplementation("io.quarkus:quarkus-junit5-mockito")
 
+    implementation("org.mapstruct:mapstruct:$mapstructVersion")
+    implementation("org.projectlombok:lombok:$lombokVersion")
+
     // Static Analysis
     errorprone("com.google.errorprone:error_prone_core:2.36.0")
     errorprone("com.uber.nullaway:nullaway:0.10.24")
+
+    annotationProcessor(
+        "org.mapstruct:mapstruct-processor:$mapstructVersion",
+    )
+    annotationProcessor(
+        "org.projectlombok:lombok:$lombokVersion",
+    )
+    annotationProcessor(
+        "org.projectlombok:lombok-mapstruct-binding:$lombokMapstructBindingVersion",
+    )
 }
 
 group = "com.beachape"
@@ -91,15 +108,21 @@ tasks.withType<JavaCompile>().configureEach {
             // Things we don't control anyway
             "-Xlint:-serial",
             "-Xlint:-classfile",
+            // Ignore processing warnings
+            "-Xlint:-processing",
             // Throw on warnings
             "-Werror",
         ),
     )
 
+    val generatedSourceOutputDirectory = options.generatedSourceOutputDirectory
+
     options.errorprone {
         allErrorsAsWarnings.set(false)
+        disableWarningsInGeneratedCode.set(true)
+        excludedPaths.set(generatedSourceOutputDirectory.locationOnly.map { """.*/\Q${relativePath(it)}\E/*""" })
         option("NullAway:AnnotatedPackages", "com.beachape")
-        option("disableWarningsInGeneratedCode", "true")
+        option("NullAway:ExcludedClassAnnotations", "javax.annotation.processing.Generated")
 
         // Additional Error Prone checks for safer code
         error("NullAway")

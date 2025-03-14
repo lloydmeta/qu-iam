@@ -1,7 +1,14 @@
 package com.beachape.quiam.app.routes.users;
 
 import com.beachape.quiam.app.authentication.JwtIdentityProvider;
-import com.beachape.quiam.app.routes.users.ApiModels.*;
+import com.beachape.quiam.app.routes.users.ApiModels.AuthenticationRequest;
+import com.beachape.quiam.app.routes.users.ApiModels.AuthenticationResponse;
+import com.beachape.quiam.app.routes.users.ApiModels.EmptyResponse;
+import com.beachape.quiam.app.routes.users.ApiModels.ErrorResponse;
+import com.beachape.quiam.app.routes.users.ApiModels.Mappers;
+import com.beachape.quiam.app.routes.users.ApiModels.UpsertUserRequest;
+import com.beachape.quiam.app.routes.users.ApiModels.UpsertUserResponse;
+import com.beachape.quiam.app.routes.users.ApiModels.UserResponse;
 import com.beachape.quiam.domain.jwt.JwtService;
 import com.beachape.quiam.domain.users.UsersService;
 import com.beachape.quiam.domain.users.UsersService.UpsertUser;
@@ -33,9 +40,14 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponseSchema;
 public class UsersResource {
   private final UsersService usersService;
   private final JwtService jwtService;
+  private final Mappers.UpsertUserRequestMapper upsertUserRequestMapper;
 
   @Inject
-  public UsersResource(UsersService usersService, JwtService jwtService) {
+  public UsersResource(
+      UsersService usersService,
+      JwtService jwtService,
+      Mappers.UpsertUserRequestMapper upsertUserRequestMapper) {
+    this.upsertUserRequestMapper = upsertUserRequestMapper;
     this.usersService = usersService;
     this.jwtService = jwtService;
   }
@@ -43,7 +55,7 @@ public class UsersResource {
   @POST
   @Path("/_upsert")
   public UpsertUserResponse upsertUser(@Valid @NotNull UpsertUserRequest request) {
-    UpsertUser domainUser = new UpsertUser(request.username(), request.password());
+    UpsertUser domainUser = upsertUserRequestMapper.fromApiModel(request);
     usersService.upsert(domainUser);
     return new UpsertUserResponse("User upserted successfully");
   }
