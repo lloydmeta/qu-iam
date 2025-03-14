@@ -30,6 +30,8 @@ Uses Java23
   * metrics
   * logs
   * tracing
+* [Lombok](https://projectlombok.org) for fluent data class builders
+* [MapStruct](https://mapstruct.org) for compile-time class mapping
 * Creating a native executable
 
 ## Running the application in dev mode
