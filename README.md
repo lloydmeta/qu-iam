@@ -1,40 +1,13 @@
 # qu-iam
 [![CI](https://github.com/lloydmeta/qu-iam/actions/workflows/ci.yml/badge.svg)](https://github.com/lloydmeta/qu-iam/actions/workflows/ci.yml)
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+This project uses Quarkus with Java 23.
 
 If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
 
-Created using
+## Exploring the application in dev mode
 
-```sh
-quarkus create app com.beachape:qu-iam \
-  --extensions=rest,rest-jackson \
-  --gradle-kotlin-dsl
-```
-
-Uses Java23
-
-## Explored areas
-
-* Quarkus (extensions etc)
-* Java 21+ style, features
-* BouncyCastle FIPS
-* Domain-modelling-style organisation
-* Authentication:
-  * Creating Users w/ passwords
-  * Getting a cookie + JWT back for a given user upon providing ^
-  * Returning user info when presented with cookie or bearer auth
-* OpenAPI
-* o11y:
-  * metrics
-  * logs
-  * tracing
-* [Lombok](https://projectlombok.org) for fluent data class builders
-* [MapStruct](https://mapstruct.org) for compile-time class mapping
-* Creating a native executable
-
-## Running the application in dev mode
+Ensure you have Java 23 installed and set as the "current" Java version.
 
 You can run your application in dev mode that enables live coding using:
 
@@ -42,7 +15,12 @@ You can run your application in dev mode that enables live coding using:
 ./gradlew quarkusDev
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+* When that is running, hit `r` to start live continuous testing
+* **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+* Play around with the REST API using the OpenAPI UI, which you can navigate from the Dev UI, but can also find at <http://localhost:8080/q/swagger-ui/>.
+  * This was integrated using the [Quarkus OpenAPI extension](https://quarkus.io/extensions/io.quarkus/quarkus-smallrye-openapi/) (based on an implementation of [the MicroProfile OpenAPI spec](https://github.com/smallrye/smallrye-open-api)) following [this guide](https://quarkus.io/guides/openapi-swaggerui)
+* Look around at [other Quarkus Extensions](https://quarkus.io/extensions/); another one already used in the app is the [OpenTelemetry one](https://quarkus.io/extensions/io.quarkus/quarkus-opentelemetry/); see the [related section below](#opentelementry) for how to run the app while exporting traces to your Otel server.
+
 
 ## Packaging and running the application
 
@@ -105,10 +83,39 @@ Easily start your REST Web Services
 
 ## OpenTelementry
 
-Set the OTel url and secrets in your env, then run, e.g.
+Set the OTel url and secrets in your env, then run the app (`OTEL_EXPORTER_OTLP_URL` can be the URL of your Elastic APM server for instance):
 
 ```sh
 export QUARKUS_OTEL_EXPORTER_OTLP_ENDPOINT="${OTEL_EXPORTER_OTLP_URL}"
 export QUARKUS_OTEL_EXPORTER_OTLP_HEADERS="authorization=Bearer ${OTEL_EXPORTER_OTLP_SECRET_TOKEN}"
 ./gradlew quarkusDev
 ```
+
+## Explored areas
+
+* Quarkus (extensions etc)
+* Java 21+ style, features
+* BouncyCastle FIPS
+* Domain-modelling-style organisation
+* Authentication:
+  * Creating Users w/ passwords
+  * Getting a cookie + JWT back for a given user upon providing ^
+  * Returning user info when presented with cookie or bearer auth
+* OpenAPI
+* o11y:
+  * metrics
+  * logs
+  * tracing
+* [Lombok](https://projectlombok.org) for fluent data class builders
+* [MapStruct](https://mapstruct.org) for compile-time class mapping
+* Creating a native executable
+
+
+## Created using
+
+```sh
+quarkus create app com.beachape:qu-iam \
+  --extensions=rest,rest-jackson \
+  --gradle-kotlin-dsl
+```
+
