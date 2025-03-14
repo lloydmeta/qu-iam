@@ -1,5 +1,7 @@
 package com.beachape.quiam.domain.users;
 
+import lombok.Builder;
+
 public interface UsersService {
 
   /** Upserts a user */
@@ -15,7 +17,9 @@ public interface UsersService {
   public static class InvalidPassword extends Exception {}
   ;
 
+  @Builder
   public static record User(String name, String passwordHash) {}
 
-  public static record UpsertUser(String name, String password) {}
+  @Builder
+  public static record UpsertUser(String username, String password) {}
 }
