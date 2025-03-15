@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("NullAway")
 @QuarkusTest
-class UsersResourceTest {
+final class UsersResourceTest {
 
   @SuppressWarnings("NullAway")
   @InjectMock

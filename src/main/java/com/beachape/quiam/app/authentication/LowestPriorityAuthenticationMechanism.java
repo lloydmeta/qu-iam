@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import io.quarkus.security.identity.IdentityProviderManager;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.quarkus.security.identity.request.AuthenticationRequest;
+import io.quarkus.security.identity.request.TokenAuthenticationRequest;
 import io.quarkus.vertx.http.runtime.security.ChallengeData;
 import io.quarkus.vertx.http.runtime.security.HttpAuthenticationMechanism;
 import io.smallrye.mutiny.Uni;
@@ -32,7 +33,7 @@ public class LowestPriorityAuthenticationMechanism implements HttpAuthentication
 
   @Override
   public Set<Class<? extends AuthenticationRequest>> getCredentialTypes() {
-    return ImmutableSet.of();
+    return ImmutableSet.of(TokenAuthenticationRequest.class);
   }
 
   @Override

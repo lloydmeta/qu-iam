@@ -1,6 +1,7 @@
 package com.beachape.quiam.app.authentication;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import io.quarkus.security.identity.IdentityProviderManager;
@@ -25,7 +26,7 @@ import org.mockito.quality.Strictness;
 @SuppressWarnings("NullAway")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class JwtCookieAuthenticationMechanismTest {
+final class JwtCookieAuthenticationMechanismTest {
   @Mock private IdentityProviderManager identityProviderManager;
 
   @Mock private RoutingContext routingContext;

@@ -24,7 +24,7 @@ import org.mockito.quality.Strictness;
 @SuppressWarnings("NullAway")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class JwtBearerAuthenticationMechanismTest {
+final class JwtBearerAuthenticationMechanismTest {
   @Mock private IdentityProviderManager identityProviderManager;
 
   @Mock private RoutingContext routingContext;

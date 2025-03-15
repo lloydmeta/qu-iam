@@ -11,7 +11,7 @@ import com.beachape.quiam.domain.users.UsersService.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class InMemoryUsersServiceTest {
+final class InMemoryUsersServiceTest {
 
   private InMemoryUsersService service;
   private static final String USERNAME = "testUser";

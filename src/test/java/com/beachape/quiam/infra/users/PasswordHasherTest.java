@@ -6,15 +6,18 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 @SuppressWarnings("StringSplitter")
-class PasswordHasherTest {
+final class PasswordHasherTest {
 
   private PasswordHasher hasher;
 
@@ -35,8 +38,8 @@ class PasswordHasherTest {
     String[] parts = hashedPassword.split(":");
     assertEquals(3, parts.length);
     assertEquals("600000", parts[0]);
-    assertTrue(parts[1].length() > 0); // salt
-    assertTrue(parts[2].length() > 0); // hash
+    assertThat(parts[1]).isNotEmpty(); // salt
+    assertThat(parts[2]).isNotEmpty(); // hash
   }
 
   @Test
@@ -49,7 +52,7 @@ class PasswordHasherTest {
     boolean result = hasher.verifyPassword(password, hashedPassword);
 
     // Then
-    assertTrue(result);
+    assertThat(result).isTrue();
   }
 
   @Test
@@ -63,26 +66,26 @@ class PasswordHasherTest {
     boolean result = hasher.verifyPassword(wrongPassword, hashedPassword);
 
     // Then
-    assertFalse(result);
+    assertThat(result).isFalse();
   }
 
   @ParameterizedTest
   @ValueSource(
       strings = {
         "", // empty string
+        "1:!@#:hash", // invalid base64 salt
+        "1:salt:!@#", // invalid base64 hash
         ":", // single colon
         "a:b", // two parts
         "a:b:c:d", // four parts
-        "notanumber:salt:hash", // invalid iteration count
-        "1:!@#:hash", // invalid base64 salt
-        "1:salt:!@#" // invalid base64 hash
+        "notanumber:salt:hash" // invalid iteration count
       })
   void verifyPassword_shouldReturnFalse_whenHashFormatIsInvalid(String invalidHash) {
-    assertFalse(hasher.verifyPassword("anyPassword", invalidHash));
+    assertThat(hasher.verifyPassword("anyPassword", invalidHash)).isFalse();
   }
 
-  @ParameterizedTest
   @MethodSource("passwordTestCases")
+  @ParameterizedTest
   void shouldVerify_variousPasswordTypes(String password) {
     // Given
     String hashedPassword = hasher.hashPassword(password);
@@ -91,16 +94,16 @@ class PasswordHasherTest {
     boolean result = hasher.verifyPassword(password, hashedPassword);
 
     // Then
-    assertTrue(result);
+    assertThat(result).isTrue();
   }
 
   private static Stream<Arguments> passwordTestCases() {
     return Stream.of(
-        Arguments.of("simple"),
-        Arguments.of("Complex Password 123!@#"),
-        Arguments.of("वेरी लॉन्ग पासवर्ड"), // Unicode password
-        Arguments.of(" leading and trailing spaces "),
-        Arguments.of("a".repeat(100)) // very long password
+        arguments("simple"),
+        arguments("Complex Password 123!@#"),
+        arguments("वेरी लॉन्ग पासवर्ड"), // Unicode password
+        arguments(" leading and trailing spaces "),
+        arguments("a".repeat(100)) // very long password
         );
   }
 
@@ -129,6 +132,6 @@ class PasswordHasherTest {
     boolean result = hasher.verifyPassword(password, modifiedHash);
 
     // Then
-    assertFalse(result);
+    assertThat(result).isFalse();
   }
 }

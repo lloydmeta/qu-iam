@@ -1,15 +1,16 @@
 package com.beachape.quiam.infra.apikeys;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.beachape.quiam.domain.apikeys.ApiKeyService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class InMemoryApiKeyServiceTest {
+final class InMemoryApiKeyServiceTest {
   private InMemoryApiKeyService service;
   private static final String USER_ID = "test-user-123";
 
@@ -23,8 +24,8 @@ class InMemoryApiKeyServiceTest {
     String key1 = service.createApiKey(USER_ID);
     String key2 = service.createApiKey(USER_ID);
 
-    assertNotNull(key1);
-    assertNotNull(key2);
+    assertThat(key1).isNotNull();
+    assertThat(key2).isNotNull();
     assertNotEquals(key1, key2);
   }
 
@@ -38,9 +39,8 @@ class InMemoryApiKeyServiceTest {
 
   @Test
   void validateApiKey_shouldThrowException_whenKeyDoesNotExist() {
-    assertThrows(
-        ApiKeyService.ApiKeyNotFoundException.class,
-        () -> service.validateApiKey("nonexistent-key"));
+    assertThatThrownBy(() -> service.validateApiKey("nonexistent-key"))
+        .isInstanceOf(ApiKeyService.ApiKeyNotFoundException.class);
   }
 
   @Test
@@ -52,13 +52,14 @@ class InMemoryApiKeyServiceTest {
     service.deleteApiKey(apiKey);
 
     // Then
-    assertThrows(ApiKeyService.ApiKeyNotFoundException.class, () -> service.validateApiKey(apiKey));
+    assertThatThrownBy(() -> service.validateApiKey(apiKey))
+        .isInstanceOf(ApiKeyService.ApiKeyNotFoundException.class);
   }
 
   @Test
   void deleteApiKey_shouldThrowException_whenKeyDoesNotExist() {
-    assertThrows(
-        ApiKeyService.ApiKeyNotFoundException.class, () -> service.deleteApiKey("nonexistent-key"));
+    assertThatThrownBy(() -> service.deleteApiKey("nonexistent-key"))
+        .isInstanceOf(ApiKeyService.ApiKeyNotFoundException.class);
   }
 
   @Test
@@ -79,7 +80,8 @@ class InMemoryApiKeyServiceTest {
     service.deleteApiKey(key1);
 
     // Then the other should still be valid
-    assertThrows(ApiKeyService.ApiKeyNotFoundException.class, () -> service.validateApiKey(key1));
+    assertThatThrownBy(() -> service.validateApiKey(key1))
+        .isInstanceOf(ApiKeyService.ApiKeyNotFoundException.class);
     assertEquals(user2, service.validateApiKey(key2));
   }
 }

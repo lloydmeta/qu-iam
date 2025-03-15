@@ -1,19 +1,19 @@
 package com.beachape.quiam.infra.crypto;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 
-class RegenOnAppStartAsymmetricKeysManagerTest {
+final class RegenOnAppStartAsymmetricKeysManagerTest {
 
   @Test
   void onStart_shouldGenerateValidKeyPair() {
     RegenOnAppStartAsymmetricKeysManager manager = new RegenOnAppStartAsymmetricKeysManager();
 
-    assertNotNull(manager.getPrivateKey());
-    assertNotNull(manager.getPublicKey());
+    assertThat(manager.getPrivateKey()).isNotNull();
+    assertThat(manager.getPublicKey()).isNotNull();
     assertEquals("RSA", manager.getPrivateKey().getAlgorithm());
     assertEquals("RSA", manager.getPublicKey().getAlgorithm());
   }

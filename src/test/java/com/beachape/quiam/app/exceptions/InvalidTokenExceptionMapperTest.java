@@ -9,7 +9,7 @@ import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("NullAway")
-class InvalidTokenExceptionMapperTest {
+final class InvalidTokenExceptionMapperTest {
   private final InvalidTokenExceptionMapper mapper = new InvalidTokenExceptionMapper();
 
   @Test

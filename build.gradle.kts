@@ -52,6 +52,7 @@ dependencies {
     testImplementation("io.rest-assured:rest-assured")
     // https://mvnrepository.com/artifact/io.quarkus/quarkus-junit5-mockito
     testImplementation("io.quarkus:quarkus-junit5-mockito")
+    testImplementation("org.assertj:assertj-core:3.11.1")
 
     implementation("org.mapstruct:mapstruct:$mapstructVersion")
     implementation("org.projectlombok:lombok:$lombokVersion")

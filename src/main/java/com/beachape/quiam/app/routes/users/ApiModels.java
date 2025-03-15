@@ -14,15 +14,15 @@ public final class ApiModels {
 
   @Builder
   public static record UpsertUserRequest(
-      @NotBlank @Schema(examples = {"lloyd"}) String username,
-      @NotBlank @Schema(examples = {"passw0rd"}) String password) {}
+      @NotBlank @Schema(examples = "lloyd") String username,
+      @NotBlank @Schema(examples = "passw0rd") String password) {}
 
   public static record UpsertUserResponse(String message) {}
 
   @Builder
   public static record AuthenticationRequest(
-      @NotBlank @Schema(examples = {"lloyd"}) String username,
-      @NotBlank @Schema(examples = {"passw0rd"}) String password) {}
+      @NotBlank @Schema(examples = "lloyd") String username,
+      @NotBlank @Schema(examples = "passw0rd") String password) {}
 
   @Builder
   public static record AuthenticationResponse(String username, String token) {}

@@ -60,9 +60,9 @@ public class UsersResource {
     return new UpsertUserResponse("User upserted successfully");
   }
 
+  @APIResponseSchema(AuthenticationResponse.class)
   @POST
   @Path("/_login")
-  @APIResponseSchema(value = AuthenticationResponse.class)
   @PermitAll
   public Response login(
       @Valid @NotNull AuthenticationRequest request, @Context HttpServerRequest serverRequest) {
@@ -94,11 +94,11 @@ public class UsersResource {
     }
   }
 
-  @POST
-  @Path("/_logout")
+  @APIResponseSchema(EmptyResponse.class)
   @Authenticated
   @Consumes({MediaType.APPLICATION_JSON, MediaType.WILDCARD})
-  @APIResponseSchema(value = EmptyResponse.class)
+  @POST
+  @Path("/_logout")
   public Response logout(
       @Context SecurityIdentity securityIdentity, @Context HttpServerRequest serverRequest) {
     try {
@@ -122,9 +122,9 @@ public class UsersResource {
     }
   }
 
+  @Authenticated
   @GET
   @Path("/me")
-  @Authenticated
   public UserResponse getUser(@Context SecurityIdentity securityIdentity) {
     String username = securityIdentity.getPrincipal().getName();
     return new UserResponse(username);

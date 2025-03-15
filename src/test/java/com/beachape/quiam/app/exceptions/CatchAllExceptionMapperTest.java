@@ -7,7 +7,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 
-class CatchAllExceptionMapperTest {
+final class CatchAllExceptionMapperTest {
   private final CatchAllExceptionMapper mapper = new CatchAllExceptionMapper();
 
   @Test

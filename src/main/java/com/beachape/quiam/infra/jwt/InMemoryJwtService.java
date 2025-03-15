@@ -7,9 +7,11 @@ import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.smallrye.jwt.auth.principal.JWTParser;
 import io.smallrye.jwt.build.Jwt;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Default;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
+@Default
 @ApplicationScoped
 public class InMemoryJwtService implements JwtService {
   private final ApiKeyService apiKeyService;
