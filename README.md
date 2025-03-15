@@ -45,7 +45,7 @@ The application, packaged as an _über-jar_, is now runnable using `java -jar bu
 
 ## Creating a native executable
 
-You can create a native executable using:
+You can create a native executable if you have GraalVM installed (`brew install --cask graalvm-jdk` will do it on Mac) using:
 
 ```shell script
 ./gradlew build \
@@ -54,7 +54,7 @@ You can create a native executable using:
   -Dquarkus.native.additional-build-args='--emit build-report'
 ```
 
-Or, if you don't have GraalVM installed (`brew install --cask graalvm-jdk` will do it on Mac), you can run the native executable build in a container using:
+Or, if you don't and are targeting Linux, you can run the native executable build in a container using:
 
 ```shell script
 ./gradlew build \
