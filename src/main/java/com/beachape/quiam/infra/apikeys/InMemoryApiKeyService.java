@@ -1,11 +1,12 @@
 package com.beachape.quiam.infra.apikeys;
 
+import static java.util.UUID.randomUUID;
+
 import com.beachape.quiam.domain.apikeys.ApiKeyService;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Default;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Default
@@ -13,25 +14,25 @@ import java.util.concurrent.ConcurrentHashMap;
 public class InMemoryApiKeyService implements ApiKeyService {
   private final Map<String, String> apiKeys = new ConcurrentHashMap<>(); // apiKey -> userId
 
-  @WithSpan
   @Override
+  @WithSpan
   public String createApiKey(String userId) {
 
-    String apiKey = UUID.randomUUID().toString();
+    String apiKey = randomUUID().toString();
     apiKeys.put(apiKey, userId);
     return apiKey;
   }
 
-  @WithSpan
   @Override
+  @WithSpan
   public void deleteApiKey(String apiKey) throws ApiKeyNotFoundException {
     if (apiKeys.remove(apiKey) == null) {
       throw new ApiKeyNotFoundException();
     }
   }
 
-  @WithSpan
   @Override
+  @WithSpan
   public String validateApiKey(String apiKey) throws ApiKeyNotFoundException {
     String userId = apiKeys.get(apiKey);
     if (userId == null) {

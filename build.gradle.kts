@@ -13,6 +13,17 @@ repositories {
     mavenLocal()
 }
 
+group = "com.beachape"
+version = "1.0.0-SNAPSHOT"
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(23))
+    }
+    sourceCompatibility = JavaVersion.VERSION_23
+    targetCompatibility = JavaVersion.VERSION_23
+}
+
 val quarkusPlatformGroupId: String by project
 val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
@@ -20,6 +31,9 @@ val quarkusPlatformVersion: String by project
 val mapstructVersion = "1.6.3"
 val lombokVersion = "1.18.36"
 val lombokMapstructBindingVersion = "0.2.0"
+
+val errorProneVersion = "2.36.0"
+val errorProneSupportVersion = "0.20.0"
 
 dependencies {
     implementation("io.quarkus:quarkus-hibernate-validator")
@@ -43,8 +57,12 @@ dependencies {
     implementation("org.projectlombok:lombok:$lombokVersion")
 
     // Static Analysis
-    errorprone("com.google.errorprone:error_prone_core:2.36.0")
+    errorprone("com.google.errorprone:error_prone_core:$errorProneVersion")
     errorprone("com.uber.nullaway:nullaway:0.10.24")
+    // Error Prone Support's additional bug checkers.
+    errorprone("tech.picnic.error-prone-support:error-prone-contrib:$errorProneSupportVersion")
+    // Error Prone Support's Refaster rules.
+    errorprone("tech.picnic.error-prone-support:refaster-runner:$errorProneSupportVersion")
 
     annotationProcessor(
         "org.mapstruct:mapstruct-processor:$mapstructVersion",
@@ -55,17 +73,6 @@ dependencies {
     annotationProcessor(
         "org.projectlombok:lombok-mapstruct-binding:$lombokMapstructBindingVersion",
     )
-}
-
-group = "com.beachape"
-version = "1.0.0-SNAPSHOT"
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(23))
-    }
-    sourceCompatibility = JavaVersion.VERSION_23
-    targetCompatibility = JavaVersion.VERSION_23
 }
 
 spotless {

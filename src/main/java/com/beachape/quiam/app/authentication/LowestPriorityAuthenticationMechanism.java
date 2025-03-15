@@ -1,9 +1,9 @@
 package com.beachape.quiam.app.authentication;
 
+import com.google.common.collect.ImmutableSet;
 import io.quarkus.security.identity.IdentityProviderManager;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.quarkus.security.identity.request.AuthenticationRequest;
-import io.quarkus.security.identity.request.TokenAuthenticationRequest;
 import io.quarkus.vertx.http.runtime.security.ChallengeData;
 import io.quarkus.vertx.http.runtime.security.HttpAuthenticationMechanism;
 import io.smallrye.mutiny.Uni;
@@ -12,7 +12,6 @@ import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
-import java.util.Collections;
 import java.util.Set;
 
 @ApplicationScoped
@@ -33,7 +32,7 @@ public class LowestPriorityAuthenticationMechanism implements HttpAuthentication
 
   @Override
   public Set<Class<? extends AuthenticationRequest>> getCredentialTypes() {
-    return Collections.singleton(TokenAuthenticationRequest.class);
+    return ImmutableSet.of();
   }
 
   @Override
