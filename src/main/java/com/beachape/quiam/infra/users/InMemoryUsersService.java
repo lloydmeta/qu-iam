@@ -15,16 +15,16 @@ public class InMemoryUsersService implements UsersService {
 
   private final Map<String, User> users = new ConcurrentHashMap<>();
 
-  @WithSpan
   @Override
+  @WithSpan
   public void upsert(UpsertUser newUser) {
     String passwordHash = hasher.hashPassword(newUser.password());
     User user = User.builder().name(newUser.username()).passwordHash(passwordHash).build();
     users.put(user.name(), user);
   }
 
-  @WithSpan
   @Override
+  @WithSpan
   public User authenticate(String name, String password) throws NoSuchUser, InvalidPassword {
     User retrievedUser = users.get(name);
     if (retrievedUser == null) {

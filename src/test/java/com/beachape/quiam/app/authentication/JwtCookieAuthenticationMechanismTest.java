@@ -1,6 +1,8 @@
 package com.beachape.quiam.app.authentication;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import io.quarkus.security.identity.IdentityProviderManager;
@@ -25,7 +27,7 @@ import org.mockito.quality.Strictness;
 @SuppressWarnings("NullAway")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class JwtCookieAuthenticationMechanismTest {
+final class JwtCookieAuthenticationMechanismTest {
   @Mock private IdentityProviderManager identityProviderManager;
 
   @Mock private RoutingContext routingContext;
@@ -53,7 +55,7 @@ class JwtCookieAuthenticationMechanismTest {
     Uni<SecurityIdentity> result = mechanism.authenticate(routingContext, identityProviderManager);
 
     // Then
-    assertNull(result.await().indefinitely());
+    assertThat(result.await().indefinitely()).isNull();
     verify(identityProviderManager, never()).authenticate(any());
   }
 
@@ -67,7 +69,7 @@ class JwtCookieAuthenticationMechanismTest {
     Uni<SecurityIdentity> result = mechanism.authenticate(routingContext, identityProviderManager);
 
     // Then
-    assertNull(result.await().indefinitely());
+    assertThat(result.await().indefinitely()).isNull();
     verify(identityProviderManager, never()).authenticate(any());
   }
 
@@ -84,14 +86,14 @@ class JwtCookieAuthenticationMechanismTest {
         mechanism.authenticate(routingContext, identityProviderManager).await().indefinitely();
 
     // Then
-    assertSame(securityIdentity, result);
+    assertThat(result).isSameAs(securityIdentity);
 
     ArgumentCaptor<TokenAuthenticationRequest> requestCaptor =
         ArgumentCaptor.forClass(TokenAuthenticationRequest.class);
     verify(identityProviderManager).authenticate(requestCaptor.capture());
 
     TokenAuthenticationRequest authRequest = requestCaptor.getValue();
-    assertEquals("test-token", authRequest.getToken().getToken());
+    assertThat(authRequest.getToken().getToken()).isEqualTo("test-token");
   }
 
   @Test
@@ -100,17 +102,18 @@ class JwtCookieAuthenticationMechanismTest {
     ChallengeData challenge = mechanism.getChallenge(routingContext).await().indefinitely();
 
     // Then
-    assertNotNull(challenge);
-    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), challenge.status);
-    assertEquals(HttpHeaders.WWW_AUTHENTICATE, challenge.headerName);
-    assertEquals("cookie; cookie-name=\"session\"", challenge.headerContent);
+    assertThat(challenge).isNotNull();
+    assertThat(challenge.status).isEqualTo(Response.Status.UNAUTHORIZED.getStatusCode());
+    assertThat(challenge.headerName).isEqualTo(HttpHeaders.WWW_AUTHENTICATE);
+    assertThat(challenge.headerContent).isEqualTo("cookie; cookie-name=\"session\"");
   }
 
   @Test
   void getCredentialTypes_shouldReturnTokenAuthenticationRequest() {
     // When/Then
-    assertEquals(1, mechanism.getCredentialTypes().size());
-    assertTrue(mechanism.getCredentialTypes().contains(TokenAuthenticationRequest.class));
+    assertThat(mechanism.getCredentialTypes())
+        .hasSize(1)
+        .contains(TokenAuthenticationRequest.class);
   }
 
   @Test
@@ -123,9 +126,13 @@ class JwtCookieAuthenticationMechanismTest {
         .thenReturn(Uni.createFrom().failure(testException));
 
     // When/Then
-    assertThrows(
-        RuntimeException.class,
-        () ->
-            mechanism.authenticate(routingContext, identityProviderManager).await().indefinitely());
+    assertThatThrownBy(
+            () ->
+                mechanism
+                    .authenticate(routingContext, identityProviderManager)
+                    .await()
+                    .indefinitely())
+        .isInstanceOf(RuntimeException.class)
+        .hasMessage("Test error");
   }
 }

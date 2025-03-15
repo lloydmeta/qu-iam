@@ -1,5 +1,6 @@
 package com.beachape.quiam.app.authentication;
 
+import com.google.common.collect.ImmutableSet;
 import io.quarkus.security.credential.TokenCredential;
 import io.quarkus.security.identity.IdentityProviderManager;
 import io.quarkus.security.identity.SecurityIdentity;
@@ -13,7 +14,6 @@ import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
-import java.util.Collections;
 import java.util.Set;
 
 @ApplicationScoped
@@ -52,6 +52,6 @@ public class JwtBearerAuthenticationMechanism implements HttpAuthenticationMecha
 
   @Override
   public Set<Class<? extends AuthenticationRequest>> getCredentialTypes() {
-    return Collections.singleton(TokenAuthenticationRequest.class);
+    return ImmutableSet.of(TokenAuthenticationRequest.class);
   }
 }

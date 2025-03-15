@@ -1,8 +1,7 @@
 package com.beachape.quiam.infra.users;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.beachape.quiam.domain.users.UsersService.InvalidPassword;
 import com.beachape.quiam.domain.users.UsersService.NoSuchUser;
@@ -11,7 +10,7 @@ import com.beachape.quiam.domain.users.UsersService.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class InMemoryUsersServiceTest {
+final class InMemoryUsersServiceTest {
 
   private InMemoryUsersService service;
   private static final String USERNAME = "testUser";
@@ -32,7 +31,7 @@ class InMemoryUsersServiceTest {
 
     // Then
     User authenticatedUser = service.authenticate(USERNAME, PASSWORD);
-    assertEquals(USERNAME, authenticatedUser.name());
+    assertThat(authenticatedUser.name()).isEqualTo(USERNAME);
   }
 
   @Test
@@ -47,14 +46,16 @@ class InMemoryUsersServiceTest {
     service.upsert(new UpsertUser(USERNAME, newPassword));
 
     // Then
-    assertThrows(InvalidPassword.class, () -> service.authenticate(USERNAME, oldPassword));
+    assertThatThrownBy(() -> service.authenticate(USERNAME, oldPassword))
+        .isInstanceOf(InvalidPassword.class);
     User authenticatedUser = service.authenticate(USERNAME, newPassword);
-    assertEquals(USERNAME, authenticatedUser.name());
+    assertThat(authenticatedUser.name()).isEqualTo(USERNAME);
   }
 
   @Test
   void authenticate_shouldThrowNoSuchUser_whenUserDoesNotExist() throws Exception {
-    assertThrows(NoSuchUser.class, () -> service.authenticate("nonexistentUser", PASSWORD));
+    assertThatThrownBy(() -> service.authenticate("nonexistentUser", PASSWORD))
+        .isInstanceOf(NoSuchUser.class);
   }
 
   @Test
@@ -63,7 +64,8 @@ class InMemoryUsersServiceTest {
     service.upsert(new UpsertUser(USERNAME, PASSWORD));
 
     // When/Then
-    assertThrows(InvalidPassword.class, () -> service.authenticate(USERNAME, "wrongPassword"));
+    assertThatThrownBy(() -> service.authenticate(USERNAME, "wrongPassword"))
+        .isInstanceOf(InvalidPassword.class);
   }
 
   @Test
@@ -75,8 +77,8 @@ class InMemoryUsersServiceTest {
     User authenticatedUser = service.authenticate(USERNAME, PASSWORD);
 
     // Then
-    assertEquals(USERNAME, authenticatedUser.name());
-    assertNotNull(authenticatedUser.passwordHash());
+    assertThat(authenticatedUser.name()).isEqualTo(USERNAME);
+    assertThat(authenticatedUser.passwordHash()).isNotNull();
   }
 
   @Test
@@ -94,8 +96,8 @@ class InMemoryUsersServiceTest {
     User auth1 = service.authenticate(user1, pass1);
     User auth2 = service.authenticate(user2, pass2);
 
-    assertEquals(user1, auth1.name());
-    assertEquals(user2, auth2.name());
+    assertThat(auth1.name()).isEqualTo(user1);
+    assertThat(auth2.name()).isEqualTo(user2);
   }
 
   @Test
@@ -105,6 +107,7 @@ class InMemoryUsersServiceTest {
     service.upsert(new UpsertUser(USERNAME, PASSWORD));
 
     // When/Then
-    assertThrows(InvalidPassword.class, () -> service.authenticate(USERNAME, PASSWORD + "wrong"));
+    assertThatThrownBy(() -> service.authenticate(USERNAME, PASSWORD + "wrong"))
+        .isInstanceOf(InvalidPassword.class);
   }
 }

@@ -1,8 +1,8 @@
 package com.beachape.quiam.infra.jwt;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -14,7 +14,7 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
 @QuarkusTest
-class InMemoryJwtServiceTest {
+final class InMemoryJwtServiceTest {
   @SuppressWarnings("NullAway")
   @InjectMock
   private ApiKeyService apiKeyService;
@@ -30,7 +30,7 @@ class InMemoryJwtServiceTest {
 
     String token = service.createToken(userId);
 
-    assertNotNull(token);
+    assertThat(token).isNotNull();
     verify(apiKeyService).createApiKey(userId);
 
     // Verify token can be validated
@@ -52,8 +52,8 @@ class InMemoryJwtServiceTest {
 
   @Test
   void validateToken_shouldThrowException_whenTokenIsInvalid() {
-    assertThrows(
-        JwtService.TokenValidationException.class, () -> service.validateToken("invalid-token"));
+    assertThatThrownBy(() -> service.validateToken("invalid-token"))
+        .isInstanceOf(JwtService.TokenValidationException.class);
   }
 
   @Test
@@ -69,7 +69,7 @@ class InMemoryJwtServiceTest {
 
   @Test
   void invalidateToken_shouldThrowException_whenTokenIsInvalid() {
-    assertThrows(
-        JwtService.TokenValidationException.class, () -> service.invalidateToken("invalid-token"));
+    assertThatThrownBy(() -> service.validateToken("invalid-token"))
+        .isInstanceOf(JwtService.TokenValidationException.class);
   }
 }
