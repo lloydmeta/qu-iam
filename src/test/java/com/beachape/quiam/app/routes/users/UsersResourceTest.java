@@ -15,9 +15,9 @@ import io.quarkus.test.junit.QuarkusTest;
 import jakarta.ws.rs.core.MediaType;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("NullAway")
+@SuppressWarnings({"JUnitClassModifiers", "NullAway"})
 @QuarkusTest
-final class UsersResourceTest {
+class UsersResourceTest {
 
   @SuppressWarnings("NullAway")
   @InjectMock
