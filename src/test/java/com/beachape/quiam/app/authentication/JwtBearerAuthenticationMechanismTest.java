@@ -1,6 +1,7 @@
 package com.beachape.quiam.app.authentication;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 import io.quarkus.security.identity.IdentityProviderManager;
@@ -50,7 +51,7 @@ final class JwtBearerAuthenticationMechanismTest {
     Uni<SecurityIdentity> result = mechanism.authenticate(routingContext, identityProviderManager);
 
     // Then
-    assertNull(result.await().indefinitely());
+    assertThat(result.await().indefinitely()).isNull();
     verify(identityProviderManager, never()).authenticate(any());
   }
 
@@ -63,7 +64,7 @@ final class JwtBearerAuthenticationMechanismTest {
     Uni<SecurityIdentity> result = mechanism.authenticate(routingContext, identityProviderManager);
 
     // Then
-    assertNull(result.await().indefinitely());
+    assertThat(result.await().indefinitely()).isNull();
     verify(identityProviderManager, never()).authenticate(any());
   }
 
@@ -76,7 +77,7 @@ final class JwtBearerAuthenticationMechanismTest {
     Uni<SecurityIdentity> result = mechanism.authenticate(routingContext, identityProviderManager);
 
     // Then
-    assertNull(result.await().indefinitely());
+    assertThat(result.await().indefinitely()).isNull();
     verify(identityProviderManager, never()).authenticate(any());
   }
 
@@ -92,14 +93,14 @@ final class JwtBearerAuthenticationMechanismTest {
         mechanism.authenticate(routingContext, identityProviderManager).await().indefinitely();
 
     // Then
-    assertSame(securityIdentity, result);
+    assertThat(result).isSameAs(securityIdentity);
 
     ArgumentCaptor<TokenAuthenticationRequest> requestCaptor =
         ArgumentCaptor.forClass(TokenAuthenticationRequest.class);
     verify(identityProviderManager).authenticate(requestCaptor.capture());
 
     TokenAuthenticationRequest authRequest = requestCaptor.getValue();
-    assertEquals("test-token", authRequest.getToken().getToken());
+    assertThat(authRequest.getToken().getToken()).isEqualTo("test-token");
   }
 
   @Test
@@ -108,17 +109,18 @@ final class JwtBearerAuthenticationMechanismTest {
     ChallengeData challenge = mechanism.getChallenge(routingContext).await().indefinitely();
 
     // Then
-    assertNotNull(challenge);
-    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), challenge.status);
-    assertEquals(HttpHeaders.WWW_AUTHENTICATE, challenge.headerName);
-    assertEquals("Bearer realm=\"beachape-api\"", challenge.headerContent);
+    assertThat(challenge).isNotNull();
+    assertThat(challenge.status).isEqualTo(Response.Status.UNAUTHORIZED.getStatusCode());
+    assertThat(challenge.headerName).isEqualTo(HttpHeaders.WWW_AUTHENTICATE);
+    assertThat(challenge.headerContent).isEqualTo("Bearer realm=\"beachape-api\"");
   }
 
   @Test
   void getCredentialTypes_shouldReturnTokenAuthenticationRequest() {
     // When/Then
-    assertEquals(1, mechanism.getCredentialTypes().size());
-    assertTrue(mechanism.getCredentialTypes().contains(TokenAuthenticationRequest.class));
+    assertThat(mechanism.getCredentialTypes())
+        .hasSize(1)
+        .contains(TokenAuthenticationRequest.class);
   }
 
   @Test
@@ -130,9 +132,13 @@ final class JwtBearerAuthenticationMechanismTest {
         .thenReturn(Uni.createFrom().failure(testException));
 
     // When/Then
-    assertThrows(
-        RuntimeException.class,
-        () ->
-            mechanism.authenticate(routingContext, identityProviderManager).await().indefinitely());
+    assertThatThrownBy(
+            () ->
+                mechanism
+                    .authenticate(routingContext, identityProviderManager)
+                    .await()
+                    .indefinitely())
+        .isInstanceOf(RuntimeException.class)
+        .hasMessage("Test error");
   }
 }
