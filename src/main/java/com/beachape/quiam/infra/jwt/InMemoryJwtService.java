@@ -16,7 +16,7 @@ public class InMemoryJwtService implements JwtService {
   private final AsymmetricKeysManager keysManager;
   private final JWTParser parser;
 
-  public static final String ApiKeyClaim = "api_key";
+  public static final String API_KEY_CLAIM = "api_key";
 
   @Inject
   public InMemoryJwtService(
@@ -26,24 +26,24 @@ public class InMemoryJwtService implements JwtService {
     this.parser = parser;
   }
 
-  @WithSpan
   @Override
+  @WithSpan
   public String createToken(String userId) {
 
     String apiKey = apiKeyService.createApiKey(userId);
     return Jwt.claims()
         .issuer("beachape-api")
         .subject(userId)
-        .claim(ApiKeyClaim, apiKey)
+        .claim(API_KEY_CLAIM, apiKey)
         .sign(keysManager.getPrivateKey());
   }
 
-  @WithSpan
   @Override
+  @WithSpan
   public String validateToken(String token) throws TokenValidationException {
     try {
       JsonWebToken jwt = parser.verify(token, keysManager.getPublicKey());
-      String apiKey = jwt.getClaim(ApiKeyClaim).toString();
+      String apiKey = jwt.getClaim(API_KEY_CLAIM).toString();
       apiKeyService.validateApiKey(apiKey);
       return jwt.getSubject();
     } catch (Exception e) {
@@ -51,12 +51,12 @@ public class InMemoryJwtService implements JwtService {
     }
   }
 
-  @WithSpan
   @Override
+  @WithSpan
   public void invalidateToken(String token) throws TokenValidationException {
     try {
       JsonWebToken jwt = parser.verify(token, keysManager.getPublicKey());
-      String apiKey = jwt.getClaim(ApiKeyClaim).toString();
+      String apiKey = jwt.getClaim(API_KEY_CLAIM).toString();
       apiKeyService.deleteApiKey(apiKey);
     } catch (Exception e) {
       throw new TokenValidationException(e);
