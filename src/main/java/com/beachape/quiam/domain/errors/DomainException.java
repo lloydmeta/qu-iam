@@ -5,7 +5,7 @@ package com.beachape.quiam.domain.errors;
  * This exception class overrides the {@link Throwable#fillInStackTrace()} method to avoid the
  * performance penalty of filling in the stack trace.
  */
-public class DomainException extends Exception {
+public abstract class DomainException extends Exception {
 
   public DomainException() {
     super();

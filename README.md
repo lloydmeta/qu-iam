@@ -15,7 +15,7 @@ You can run your application in dev mode that enables live coding using:
 ./gradlew quarkusDev
 ```
 
-* When that is running, hit `r` to start live continuous testing
+* When that is running, hit `r` to start live **continuous testing** that runs all tests in a loop or `f` to only run failed tests (see [other options](https://quarkus.io/guides/continuous-testing#controlling-continuous-testing))
 * **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
 * Play around with the REST API using the OpenAPI UI, which you can navigate from the Dev UI, but can also find at <http://localhost:8080/q/swagger-ui/>.
   * This was integrated using the [Quarkus OpenAPI extension](https://quarkus.io/extensions/io.quarkus/quarkus-smallrye-openapi/) (based on an implementation of [the MicroProfile OpenAPI spec](https://github.com/smallrye/smallrye-open-api)) following [this guide](https://quarkus.io/guides/openapi-swaggerui)
