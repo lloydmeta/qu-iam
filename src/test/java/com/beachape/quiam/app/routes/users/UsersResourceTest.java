@@ -1,8 +1,7 @@
 package com.beachape.quiam.app.routes.users;
 
-import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doThrow;
+import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -10,10 +9,11 @@ import com.beachape.quiam.domain.jwt.JwtService;
 import com.beachape.quiam.domain.users.UsersService;
 import com.beachape.quiam.domain.users.UsersService.UpsertUser;
 import com.beachape.quiam.domain.users.UsersService.User;
+
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
+import static io.restassured.RestAssured.given;
 import jakarta.ws.rs.core.MediaType;
-import org.junit.jupiter.api.Test;
 
 @SuppressWarnings({"JUnitClassModifiers", "NullAway"})
 @QuarkusTest
@@ -126,6 +126,9 @@ class UsersResourceTest {
 
   @Test
   void logout_shouldClearCookie_whenValidToken() throws Exception {
+    // Given
+    when(jwtService.validateToken("valid-token")).thenReturn("test-user");
+    when(jwtService.invalidateToken("valid-token")).thenReturn(true);
     // When
     var response =
         given()
@@ -137,15 +140,15 @@ class UsersResourceTest {
 
     // Then
     response.cookie("session", "");
+    verify(jwtService).validateToken("valid-token");
     verify(jwtService).invalidateToken("valid-token");
   }
 
   @Test
   void logout_shouldReturn400_whenInvalidToken() throws Exception {
     // Given
-    doThrow(new JwtService.TokenValidationException("Invalid token"))
-        .when(jwtService)
-        .invalidateToken("invalid-token");
+    when(jwtService.validateToken("invalid-token")).thenReturn(null);
+    when(jwtService.invalidateToken("invalid-token")).thenReturn(false);
 
     // When/Then
     ApiModels.ErrorResponse response =
@@ -158,11 +161,15 @@ class UsersResourceTest {
             .extract()
             .as(ApiModels.ErrorResponse.class);
 
-    assertEquals("Invalid session token", response.error());
+    verify(jwtService).validateToken("invalid-token");
+
+    assertEquals("Invalid token", response.error());
   }
 
   @Test
   void getUser_shouldReturn200_whenValidToken() throws Exception {
+    // Given
+    when(jwtService.validateToken("valid-token")).thenReturn("test-user");
     // When/Then
     given().cookie("session", "valid-token").when().get("/api/users/me").then().statusCode(200);
 
@@ -188,9 +195,7 @@ class UsersResourceTest {
   @Test
   void getUser_shouldReturn401_whenInvalidToken() throws Exception {
     // Given
-    doThrow(new JwtService.TokenValidationException("Invalid token"))
-        .when(jwtService)
-        .validateToken("invalid-token");
+    when(jwtService.validateToken("invalid-token")).thenReturn(null);
 
     // When/Then
     ApiModels.ErrorResponse response =
@@ -238,9 +243,7 @@ class UsersResourceTest {
   @Test
   void getUser_shouldReturn401_whenInvalidBearerToken() throws Exception {
     // Given
-    doThrow(new JwtService.TokenValidationException("Invalid token"))
-        .when(jwtService)
-        .validateToken("invalid-token");
+    when(jwtService.validateToken("invalid-token")).thenReturn(null);
 
     // When/Then
     ApiModels.ErrorResponse response =
@@ -264,6 +267,7 @@ class UsersResourceTest {
         .thenReturn(new User("test-user", "test-pass"));
     when(jwtService.createToken("test-user")).thenReturn("valid-token");
     when(jwtService.validateToken("valid-token")).thenReturn("test-user");
+    when(jwtService.invalidateToken("valid-token")).thenReturn(true);
 
     // First authenticate to get the token
     ApiModels.AuthenticationResponse authResponse =
@@ -285,15 +289,14 @@ class UsersResourceTest {
         .then()
         .statusCode(200);
 
+    verify(jwtService).validateToken(authResponse.token());
     verify(jwtService).invalidateToken(authResponse.token());
   }
 
   @Test
   void logout_shouldReturn401_whenInvalidBearerToken() throws Exception {
     // Given
-    doThrow(new JwtService.TokenValidationException("Invalid token"))
-        .when(jwtService)
-        .validateToken("invalid-token");
+    when(jwtService.validateToken("invalid-token")).thenReturn(null);
 
     // When/Then
     ApiModels.ErrorResponse response =

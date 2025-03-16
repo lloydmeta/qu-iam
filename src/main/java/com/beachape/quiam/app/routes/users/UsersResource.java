@@ -98,10 +98,9 @@ public class UsersResource {
   @Path("/_logout")
   public Response logout(
       @Context SecurityIdentity securityIdentity, @Context HttpServerRequest serverRequest) {
-    try {
-      String token = securityIdentity.getAttribute(JwtIdentityProvider.JWT_TOKEN_KEY);
-      jwtService.invalidateToken(token);
 
+    String token = securityIdentity.getAttribute(JwtIdentityProvider.JWT_TOKEN_KEY);
+    if (jwtService.invalidateToken(token)) {
       NewCookie clearCookie =
           new NewCookie.Builder("session")
               .value("")
@@ -111,9 +110,9 @@ public class UsersResource {
               .secure(serverRequest.isSSL())
               .build();
       return Response.ok().entity(new EmptyResponse()).cookie(clearCookie).build();
-    } catch (JwtService.TokenValidationException e) {
+    } else {
       return Response.status(Response.Status.UNAUTHORIZED)
-          .entity(new ErrorResponse("Invalid session token"))
+          .entity(new ErrorResponse("Invalid token"))
           .build();
     }
   }
