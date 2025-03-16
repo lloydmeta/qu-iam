@@ -1,7 +1,6 @@
 package com.beachape.quiam.infra.jwt;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -49,7 +48,7 @@ final class InMemoryJwtServiceTest {
 
     String validatedUserId = service.validateToken(token);
 
-    assertEquals(userId, validatedUserId);
+    assertThat(validatedUserId).isEqualTo(userId);
 
     verify(apiKeyService).validateApiKey(apiKey);
   }
@@ -75,6 +74,6 @@ final class InMemoryJwtServiceTest {
 
   @Test
   void invalidateToken_shouldReturnFalse_whenTokenIsInvalid() {
-    assertThat(service.validateToken("invalid-token")).isNull();
+    assertThat(service.invalidateToken("invalid-token")).isFalse();
   }
 }

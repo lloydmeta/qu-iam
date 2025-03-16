@@ -1,7 +1,7 @@
 package com.beachape.quiam.app.routes.users;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.Test;
+import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -9,23 +9,18 @@ import com.beachape.quiam.domain.jwt.JwtService;
 import com.beachape.quiam.domain.users.UsersService;
 import com.beachape.quiam.domain.users.UsersService.UpsertUser;
 import com.beachape.quiam.domain.users.UsersService.User;
-
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
-import static io.restassured.RestAssured.given;
 import jakarta.ws.rs.core.MediaType;
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings({"JUnitClassModifiers", "NullAway"})
 @QuarkusTest
 class UsersResourceTest {
 
-  @SuppressWarnings("NullAway")
-  @InjectMock
-  UsersService usersService;
+  @InjectMock UsersService usersService;
 
-  @SuppressWarnings("NullAway")
-  @InjectMock
-  JwtService jwtService;
+  @InjectMock JwtService jwtService;
 
   @Test
   void upsertUser_shouldReturnSuccessMessage_whenSuccessful() {
@@ -47,7 +42,7 @@ class UsersResourceTest {
             .as(ApiModels.UpsertUserResponse.class);
 
     // Then
-    assertEquals(new ApiModels.UpsertUserResponse("User upserted successfully"), response);
+    assertThat(response).isEqualTo(new ApiModels.UpsertUserResponse("User upserted successfully"));
     verify(usersService).upsert(domainUser);
   }
 
@@ -74,8 +69,8 @@ class UsersResourceTest {
     response.cookie("session", "jwt-token-123");
     ApiModels.AuthenticationResponse authResponse =
         response.extract().as(ApiModels.AuthenticationResponse.class);
-    assertEquals("testUser", authResponse.username());
-    assertEquals("jwt-token-123", authResponse.token());
+    assertThat(authResponse.username()).isEqualTo("testUser");
+    assertThat(authResponse.token()).isEqualTo("jwt-token-123");
   }
 
   @Test
@@ -98,7 +93,7 @@ class UsersResourceTest {
             .extract()
             .as(ApiModels.ErrorResponse.class);
 
-    assertEquals("User not found", response.error());
+    assertThat(response.error()).isEqualTo("User not found");
   }
 
   @Test
@@ -121,7 +116,7 @@ class UsersResourceTest {
             .extract()
             .as(ApiModels.ErrorResponse.class);
 
-    assertEquals("Invalid password", response.error());
+    assertThat(response.error()).isEqualTo("Invalid password");
   }
 
   @Test
@@ -163,7 +158,7 @@ class UsersResourceTest {
 
     verify(jwtService).validateToken("invalid-token");
 
-    assertEquals("Invalid token", response.error());
+    assertThat(response.error()).isEqualTo("Invalid token");
   }
 
   @Test
@@ -189,7 +184,7 @@ class UsersResourceTest {
             .extract()
             .as(ApiModels.ErrorResponse.class);
 
-    assertEquals("No authentication mechanism found", response.error());
+    assertThat(response.error()).isEqualTo("No authentication mechanism found");
   }
 
   @Test
@@ -208,7 +203,7 @@ class UsersResourceTest {
             .extract()
             .as(ApiModels.ErrorResponse.class);
 
-    assertEquals("Invalid token", response.error());
+    assertThat(response.error()).isEqualTo("Invalid token");
   }
 
   @Test
@@ -257,7 +252,7 @@ class UsersResourceTest {
             .extract()
             .as(ApiModels.ErrorResponse.class);
 
-    assertEquals("Invalid token", response.error());
+    assertThat(response.error()).isEqualTo("Invalid token");
   }
 
   @Test
@@ -310,7 +305,7 @@ class UsersResourceTest {
             .extract()
             .as(ApiModels.ErrorResponse.class);
 
-    assertEquals("Invalid token", response.error());
+    assertThat(response.error()).isEqualTo("Invalid token");
   }
 
   @Test

@@ -1,8 +1,6 @@
 package com.beachape.quiam.infra.users;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import java.util.stream.Stream;
@@ -33,8 +31,8 @@ final class PasswordHasherTest {
 
     // Then
     String[] parts = hashedPassword.split(":");
-    assertEquals(3, parts.length);
-    assertEquals("600000", parts[0]);
+    assertThat(parts).hasSize(3);
+    assertThat(parts[0]).isEqualTo("600000");
     assertThat(parts[1]).isNotEmpty(); // salt
     assertThat(parts[2]).isNotEmpty(); // hash
   }
@@ -114,7 +112,7 @@ final class PasswordHasherTest {
     String hash2 = hasher.hashPassword(password);
 
     // Then
-    assertNotEquals(hash1, hash2);
+    assertThat(hash1).isNotEqualTo(hash2);
   }
 
   @Test
