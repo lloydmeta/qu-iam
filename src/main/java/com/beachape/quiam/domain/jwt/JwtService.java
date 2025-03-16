@@ -1,5 +1,7 @@
 package com.beachape.quiam.domain.jwt;
 
+import com.beachape.quiam.domain.errors.DomainException;
+
 /**
  * Service for managing JWT tokens. This service handles the creation, validation, and invalidation
  * of JWT tokens used for user authentication and session management.
@@ -30,7 +32,7 @@ public interface JwtService {
    */
   void invalidateToken(String token) throws TokenValidationException;
 
-  public class TokenValidationException extends Exception {
+  public class TokenValidationException extends DomainException {
     public TokenValidationException(String message) {
       super(message);
     }
