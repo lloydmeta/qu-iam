@@ -1,11 +1,7 @@
 package com.beachape.quiam.infra.apikeys;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import com.beachape.quiam.domain.apikeys.ApiKeyService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +21,7 @@ final class InMemoryApiKeyServiceTest {
 
     assertThat(key1).isNotNull();
     assertThat(key2).isNotNull();
-    assertNotEquals(key1, key2);
+    assertThat(key1).isNotEqualTo(key2);
   }
 
   @Test
@@ -33,13 +29,12 @@ final class InMemoryApiKeyServiceTest {
     String apiKey = service.createApiKey(USER_ID);
     String userId = service.validateApiKey(apiKey);
 
-    assertEquals(USER_ID, userId);
+    assertThat(userId).isEqualTo(USER_ID);
   }
 
   @Test
-  void validateApiKey_shouldThrowException_whenKeyDoesNotExist() {
-    assertThatThrownBy(() -> service.validateApiKey("nonexistent-key"))
-        .isInstanceOf(ApiKeyService.ApiKeyNotFoundException.class);
+  void validateApiKey_shouldReturnNull_whenKeyDoesNotExist() {
+    assertThat(service.validateApiKey("nonexistent-key")).isNull();
   }
 
   @Test
@@ -51,14 +46,12 @@ final class InMemoryApiKeyServiceTest {
     service.deleteApiKey(apiKey);
 
     // Then
-    assertThatThrownBy(() -> service.validateApiKey(apiKey))
-        .isInstanceOf(ApiKeyService.ApiKeyNotFoundException.class);
+    assertThat(service.validateApiKey(apiKey)).isNull();
   }
 
   @Test
-  void deleteApiKey_shouldThrowException_whenKeyDoesNotExist() {
-    assertThatThrownBy(() -> service.deleteApiKey("nonexistent-key"))
-        .isInstanceOf(ApiKeyService.ApiKeyNotFoundException.class);
+  void deleteApiKey_shouldReturnFalse_whenKeyDoesNotExist() {
+    assertThat(service.deleteApiKey("nonexistent-key")).isFalse();
   }
 
   @Test
@@ -72,15 +65,14 @@ final class InMemoryApiKeyServiceTest {
     String key2 = service.createApiKey(user2);
 
     // Then
-    assertEquals(user1, service.validateApiKey(key1));
-    assertEquals(user2, service.validateApiKey(key2));
+    assertThat(service.validateApiKey(key1)).isEqualTo(user1);
+    assertThat(service.validateApiKey(key2)).isEqualTo(user2);
 
     // When deleting one key
     service.deleteApiKey(key1);
+    assertThat(service.validateApiKey(key1)).isNull();
 
     // Then the other should still be valid
-    assertThatThrownBy(() -> service.validateApiKey(key1))
-        .isInstanceOf(ApiKeyService.ApiKeyNotFoundException.class);
-    assertEquals(user2, service.validateApiKey(key2));
+    assertThat(service.validateApiKey(key2)).isEqualTo(user2);
   }
 }

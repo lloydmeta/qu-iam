@@ -4,6 +4,7 @@ import static java.util.UUID.randomUUID;
 
 import com.beachape.quiam.domain.apikeys.ApiKeyService;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.annotation.Nullable;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Default;
 import java.util.Map;
@@ -25,19 +26,13 @@ public class InMemoryApiKeyService implements ApiKeyService {
 
   @Override
   @WithSpan
-  public void deleteApiKey(String apiKey) throws ApiKeyNotFoundException {
-    if (apiKeys.remove(apiKey) == null) {
-      throw new ApiKeyNotFoundException();
-    }
+  public boolean deleteApiKey(String apiKey) {
+    return apiKeys.remove(apiKey) != null;
   }
 
-  @Override
+  @Nullable @Override
   @WithSpan
-  public String validateApiKey(String apiKey) throws ApiKeyNotFoundException {
-    String userId = apiKeys.get(apiKey);
-    if (userId == null) {
-      throw new ApiKeyNotFoundException();
-    }
-    return userId;
+  public String validateApiKey(String apiKey) {
+    return apiKeys.get(apiKey);
   }
 }

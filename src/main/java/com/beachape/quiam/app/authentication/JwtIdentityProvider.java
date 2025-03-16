@@ -31,22 +31,22 @@ public class JwtIdentityProvider implements IdentityProvider<TokenAuthentication
     return Uni.createFrom()
         .item(
             () -> {
-              try {
-                String token = request.getToken().getToken();
-                String userId = jwtService.validateToken(token);
+              String token = request.getToken().getToken();
+              String userId = jwtService.validateToken(token);
+              if (userId == null) {
+                throw new InvalidTokenException("Invalid token");
+              } else {
                 return QuarkusSecurityIdentity.builder()
                     .setPrincipal(() -> userId)
                     .addAttribute(JWT_TOKEN_KEY, token)
                     .build();
-              } catch (JwtService.TokenValidationException e) {
-                throw new InvalidTokenException("Invalid token", e);
               }
             });
   }
 
-  public static class InvalidTokenException extends SecurityException {
-    public InvalidTokenException(String message, Throwable cause) {
-      super(message, cause);
+  public static class InvalidTokenException extends RuntimeException {
+    public InvalidTokenException(String message) {
+      super(message);
     }
   }
 }

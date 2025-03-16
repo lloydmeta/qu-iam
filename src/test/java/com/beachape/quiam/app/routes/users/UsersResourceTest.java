@@ -1,8 +1,7 @@
 package com.beachape.quiam.app.routes.users;
 
 import static io.restassured.RestAssured.given;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doThrow;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -19,13 +18,9 @@ import org.junit.jupiter.api.Test;
 @QuarkusTest
 class UsersResourceTest {
 
-  @SuppressWarnings("NullAway")
-  @InjectMock
-  UsersService usersService;
+  @InjectMock UsersService usersService;
 
-  @SuppressWarnings("NullAway")
-  @InjectMock
-  JwtService jwtService;
+  @InjectMock JwtService jwtService;
 
   @Test
   void upsertUser_shouldReturnSuccessMessage_whenSuccessful() {
@@ -47,7 +42,7 @@ class UsersResourceTest {
             .as(ApiModels.UpsertUserResponse.class);
 
     // Then
-    assertEquals(new ApiModels.UpsertUserResponse("User upserted successfully"), response);
+    assertThat(response).isEqualTo(new ApiModels.UpsertUserResponse("User upserted successfully"));
     verify(usersService).upsert(domainUser);
   }
 
@@ -74,8 +69,8 @@ class UsersResourceTest {
     response.cookie("session", "jwt-token-123");
     ApiModels.AuthenticationResponse authResponse =
         response.extract().as(ApiModels.AuthenticationResponse.class);
-    assertEquals("testUser", authResponse.username());
-    assertEquals("jwt-token-123", authResponse.token());
+    assertThat(authResponse.username()).isEqualTo("testUser");
+    assertThat(authResponse.token()).isEqualTo("jwt-token-123");
   }
 
   @Test
@@ -98,7 +93,7 @@ class UsersResourceTest {
             .extract()
             .as(ApiModels.ErrorResponse.class);
 
-    assertEquals("User not found", response.error());
+    assertThat(response.error()).isEqualTo("User not found");
   }
 
   @Test
@@ -121,11 +116,14 @@ class UsersResourceTest {
             .extract()
             .as(ApiModels.ErrorResponse.class);
 
-    assertEquals("Invalid password", response.error());
+    assertThat(response.error()).isEqualTo("Invalid password");
   }
 
   @Test
   void logout_shouldClearCookie_whenValidToken() throws Exception {
+    // Given
+    when(jwtService.validateToken("valid-token")).thenReturn("test-user");
+    when(jwtService.invalidateToken("valid-token")).thenReturn(true);
     // When
     var response =
         given()
@@ -137,15 +135,15 @@ class UsersResourceTest {
 
     // Then
     response.cookie("session", "");
+    verify(jwtService).validateToken("valid-token");
     verify(jwtService).invalidateToken("valid-token");
   }
 
   @Test
   void logout_shouldReturn400_whenInvalidToken() throws Exception {
     // Given
-    doThrow(new JwtService.TokenValidationException("Invalid token"))
-        .when(jwtService)
-        .invalidateToken("invalid-token");
+    when(jwtService.validateToken("invalid-token")).thenReturn(null);
+    when(jwtService.invalidateToken("invalid-token")).thenReturn(false);
 
     // When/Then
     ApiModels.ErrorResponse response =
@@ -158,11 +156,15 @@ class UsersResourceTest {
             .extract()
             .as(ApiModels.ErrorResponse.class);
 
-    assertEquals("Invalid session token", response.error());
+    verify(jwtService).validateToken("invalid-token");
+
+    assertThat(response.error()).isEqualTo("Invalid token");
   }
 
   @Test
   void getUser_shouldReturn200_whenValidToken() throws Exception {
+    // Given
+    when(jwtService.validateToken("valid-token")).thenReturn("test-user");
     // When/Then
     given().cookie("session", "valid-token").when().get("/api/users/me").then().statusCode(200);
 
@@ -182,15 +184,13 @@ class UsersResourceTest {
             .extract()
             .as(ApiModels.ErrorResponse.class);
 
-    assertEquals("No authentication mechanism found", response.error());
+    assertThat(response.error()).isEqualTo("No authentication mechanism found");
   }
 
   @Test
   void getUser_shouldReturn401_whenInvalidToken() throws Exception {
     // Given
-    doThrow(new JwtService.TokenValidationException("Invalid token"))
-        .when(jwtService)
-        .validateToken("invalid-token");
+    when(jwtService.validateToken("invalid-token")).thenReturn(null);
 
     // When/Then
     ApiModels.ErrorResponse response =
@@ -203,7 +203,7 @@ class UsersResourceTest {
             .extract()
             .as(ApiModels.ErrorResponse.class);
 
-    assertEquals("Invalid token", response.error());
+    assertThat(response.error()).isEqualTo("Invalid token");
   }
 
   @Test
@@ -238,9 +238,7 @@ class UsersResourceTest {
   @Test
   void getUser_shouldReturn401_whenInvalidBearerToken() throws Exception {
     // Given
-    doThrow(new JwtService.TokenValidationException("Invalid token"))
-        .when(jwtService)
-        .validateToken("invalid-token");
+    when(jwtService.validateToken("invalid-token")).thenReturn(null);
 
     // When/Then
     ApiModels.ErrorResponse response =
@@ -254,7 +252,7 @@ class UsersResourceTest {
             .extract()
             .as(ApiModels.ErrorResponse.class);
 
-    assertEquals("Invalid token", response.error());
+    assertThat(response.error()).isEqualTo("Invalid token");
   }
 
   @Test
@@ -264,6 +262,7 @@ class UsersResourceTest {
         .thenReturn(new User("test-user", "test-pass"));
     when(jwtService.createToken("test-user")).thenReturn("valid-token");
     when(jwtService.validateToken("valid-token")).thenReturn("test-user");
+    when(jwtService.invalidateToken("valid-token")).thenReturn(true);
 
     // First authenticate to get the token
     ApiModels.AuthenticationResponse authResponse =
@@ -285,15 +284,14 @@ class UsersResourceTest {
         .then()
         .statusCode(200);
 
+    verify(jwtService).validateToken(authResponse.token());
     verify(jwtService).invalidateToken(authResponse.token());
   }
 
   @Test
   void logout_shouldReturn401_whenInvalidBearerToken() throws Exception {
     // Given
-    doThrow(new JwtService.TokenValidationException("Invalid token"))
-        .when(jwtService)
-        .validateToken("invalid-token");
+    when(jwtService.validateToken("invalid-token")).thenReturn(null);
 
     // When/Then
     ApiModels.ErrorResponse response =
@@ -307,7 +305,7 @@ class UsersResourceTest {
             .extract()
             .as(ApiModels.ErrorResponse.class);
 
-    assertEquals("Invalid token", response.error());
+    assertThat(response.error()).isEqualTo("Invalid token");
   }
 
   @Test

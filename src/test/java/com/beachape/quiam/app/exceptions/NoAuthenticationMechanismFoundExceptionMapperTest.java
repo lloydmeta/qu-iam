@@ -1,6 +1,6 @@
 package com.beachape.quiam.app.exceptions;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.beachape.quiam.app.authentication.LowestPriorityAuthenticationMechanism.NoAuthenticationMechanismFoundException;
 import com.beachape.quiam.app.routes.users.ApiModels;
@@ -22,11 +22,11 @@ final class NoAuthenticationMechanismFoundExceptionMapperTest {
     Response response = mapper.toResponse(exception);
 
     // Then
-    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-    assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.UNAUTHORIZED.getStatusCode());
+    assertThat(response.getMediaType()).isEqualTo(MediaType.APPLICATION_JSON_TYPE);
 
     ApiModels.ErrorResponse errorResponse = (ApiModels.ErrorResponse) response.getEntity();
-    assertEquals("Invalid session", errorResponse.error());
+    assertThat(errorResponse.error()).isEqualTo("Invalid session");
   }
 
   @Test
@@ -39,10 +39,10 @@ final class NoAuthenticationMechanismFoundExceptionMapperTest {
     Response response = mapper.toResponse(exception);
 
     // Then
-    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-    assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.UNAUTHORIZED.getStatusCode());
+    assertThat(response.getMediaType()).isEqualTo(MediaType.APPLICATION_JSON_TYPE);
 
     ApiModels.ErrorResponse errorResponse = (ApiModels.ErrorResponse) response.getEntity();
-    assertEquals("Custom error message", errorResponse.error());
+    assertThat(errorResponse.error()).isEqualTo("Custom error message");
   }
 }

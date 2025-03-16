@@ -5,7 +5,9 @@ import com.beachape.quiam.domain.crypto.AsymmetricKeysManager;
 import com.beachape.quiam.domain.jwt.JwtService;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.smallrye.jwt.auth.principal.JWTParser;
+import io.smallrye.jwt.auth.principal.ParseException;
 import io.smallrye.jwt.build.Jwt;
+import jakarta.annotation.Nullable;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Default;
 import jakarta.inject.Inject;
@@ -40,28 +42,31 @@ public class InMemoryJwtService implements JwtService {
         .sign(keysManager.getPrivateKey());
   }
 
-  @Override
+  @Nullable @Override
   @WithSpan
-  public String validateToken(String token) throws TokenValidationException {
+  public String validateToken(String token) {
     try {
       JsonWebToken jwt = parser.verify(token, keysManager.getPublicKey());
       String apiKey = jwt.getClaim(API_KEY_CLAIM).toString();
-      apiKeyService.validateApiKey(apiKey);
-      return jwt.getSubject();
-    } catch (Exception e) {
-      throw new TokenValidationException(e);
+      if (apiKeyService.validateApiKey(apiKey) == null) {
+        return null;
+      } else {
+        return jwt.getSubject();
+      }
+    } catch (ParseException e) {
+      return null;
     }
   }
 
   @Override
   @WithSpan
-  public void invalidateToken(String token) throws TokenValidationException {
+  public boolean invalidateToken(String token) {
     try {
       JsonWebToken jwt = parser.verify(token, keysManager.getPublicKey());
       String apiKey = jwt.getClaim(API_KEY_CLAIM).toString();
-      apiKeyService.deleteApiKey(apiKey);
-    } catch (Exception e) {
-      throw new TokenValidationException(e);
+      return apiKeyService.deleteApiKey(apiKey);
+    } catch (ParseException e) {
+      return false;
     }
   }
 }

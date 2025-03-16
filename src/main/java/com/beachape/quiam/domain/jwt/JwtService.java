@@ -1,6 +1,6 @@
 package com.beachape.quiam.domain.jwt;
 
-import com.beachape.quiam.domain.errors.DomainException;
+import jakarta.annotation.Nullable;
 
 /**
  * Service for managing JWT tokens. This service handles the creation, validation, and invalidation
@@ -19,26 +19,15 @@ public interface JwtService {
    * Validates a JWT token.
    *
    * @param token The token to validate
-   * @return The user ID associated with the token
-   * @throws TokenValidationException if the token is invalid or expired
+   * @return The user ID associated with the token or null if the token is invalid
    */
-  String validateToken(String token) throws TokenValidationException;
+  @Nullable String validateToken(String token);
 
   /**
    * Invalidates a JWT token, preventing its future use.
    *
    * @param token The token to invalidate
-   * @throws TokenValidationException if the token is invalid or cannot be invalidated
+   * @return true if the token was successfully invalidated, false if the token is invalid
    */
-  void invalidateToken(String token) throws TokenValidationException;
-
-  public class TokenValidationException extends DomainException {
-    public TokenValidationException(String message) {
-      super(message);
-    }
-
-    public TokenValidationException(Throwable cause) {
-      super("Failed to validate token", cause);
-    }
-  }
+  boolean invalidateToken(String token);
 }

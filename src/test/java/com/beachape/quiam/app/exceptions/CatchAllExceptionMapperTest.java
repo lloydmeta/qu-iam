@@ -1,6 +1,6 @@
 package com.beachape.quiam.app.exceptions;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.beachape.quiam.app.routes.users.ApiModels;
 import jakarta.ws.rs.core.MediaType;
@@ -19,11 +19,12 @@ final class CatchAllExceptionMapperTest {
     Response response = mapper.toResponse(exception);
 
     // Then
-    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
-    assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
+    assertThat(response.getStatus())
+        .isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+    assertThat(response.getMediaType()).isEqualTo(MediaType.APPLICATION_JSON_TYPE);
 
     ApiModels.ErrorResponse errorResponse = (ApiModels.ErrorResponse) response.getEntity();
-    assertEquals("Test error message", errorResponse.error());
+    assertThat(errorResponse.error()).isEqualTo("Test error message");
   }
 
   @Test
@@ -35,11 +36,12 @@ final class CatchAllExceptionMapperTest {
     Response response = mapper.toResponse(exception);
 
     // Then
-    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
-    assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
+    assertThat(response.getStatus())
+        .isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+    assertThat(response.getMediaType()).isEqualTo(MediaType.APPLICATION_JSON_TYPE);
 
     ApiModels.ErrorResponse errorResponse = (ApiModels.ErrorResponse) response.getEntity();
-    assertEquals("Server side internal exception", errorResponse.error());
+    assertThat(errorResponse.error()).isEqualTo("Server side internal exception");
   }
 
   @Test
@@ -51,10 +53,11 @@ final class CatchAllExceptionMapperTest {
     Response response = mapper.toResponse(error);
 
     // Then
-    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
-    assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
+    assertThat(response.getStatus())
+        .isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+    assertThat(response.getMediaType()).isEqualTo(MediaType.APPLICATION_JSON_TYPE);
 
     ApiModels.ErrorResponse errorResponse = (ApiModels.ErrorResponse) response.getEntity();
-    assertEquals("Test error", errorResponse.error());
+    assertThat(errorResponse.error()).isEqualTo("Test error");
   }
 }

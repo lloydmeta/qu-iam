@@ -1,13 +1,10 @@
 package com.beachape.quiam.infra.jwt;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.beachape.quiam.domain.apikeys.ApiKeyService;
-import com.beachape.quiam.domain.jwt.JwtService;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
@@ -26,7 +23,9 @@ final class InMemoryJwtServiceTest {
   @Test
   void createToken_shouldCreateValidToken() throws Exception {
     String userId = "user123";
-    when(apiKeyService.createApiKey(userId)).thenReturn("api-key-123");
+    String apiKey = "api-key-123";
+    when(apiKeyService.createApiKey(userId)).thenReturn(apiKey);
+    when(apiKeyService.validateApiKey(apiKey)).thenReturn(userId);
 
     String token = service.createToken(userId);
 
@@ -35,41 +34,46 @@ final class InMemoryJwtServiceTest {
 
     // Verify token can be validated
     service.validateToken(token);
+    verify(apiKeyService).validateApiKey(apiKey);
   }
 
   @Test
   void validateToken_shouldValidateApiKey() throws Exception {
     String userId = "user123";
-    when(apiKeyService.createApiKey(userId)).thenReturn("api-key-123");
+    String apiKey = "api-key-123";
+    when(apiKeyService.createApiKey(userId)).thenReturn(apiKey);
+    when(apiKeyService.validateApiKey(apiKey)).thenReturn(userId);
+
     String token = service.createToken(userId);
 
     String validatedUserId = service.validateToken(token);
 
-    assertEquals(userId, validatedUserId);
+    assertThat(validatedUserId).isEqualTo(userId);
 
-    verify(apiKeyService).validateApiKey("api-key-123");
+    verify(apiKeyService).validateApiKey(apiKey);
   }
 
   @Test
-  void validateToken_shouldThrowException_whenTokenIsInvalid() {
-    assertThatThrownBy(() -> service.validateToken("invalid-token"))
-        .isInstanceOf(JwtService.TokenValidationException.class);
+  void validateToken_shouldReturnNull_whenTokenIsInvalid() {
+    assertThat(service.validateToken("invalid-token")).isNull();
   }
 
   @Test
   void invalidateToken_shouldDeleteApiKey() throws Exception {
     String userId = "user123";
-    when(apiKeyService.createApiKey(userId)).thenReturn("api-key-123");
+    String apiKey = "api-key-123";
+    when(apiKeyService.createApiKey(userId)).thenReturn(apiKey);
+    when(apiKeyService.deleteApiKey(apiKey)).thenReturn(true);
     String token = service.createToken(userId);
 
-    service.invalidateToken(token);
+    assertThat(service.invalidateToken(token)).isTrue();
 
     verify(apiKeyService).deleteApiKey("api-key-123");
+    verify(apiKeyService).deleteApiKey(apiKey);
   }
 
   @Test
-  void invalidateToken_shouldThrowException_whenTokenIsInvalid() {
-    assertThatThrownBy(() -> service.validateToken("invalid-token"))
-        .isInstanceOf(JwtService.TokenValidationException.class);
+  void invalidateToken_shouldReturnFalse_whenTokenIsInvalid() {
+    assertThat(service.invalidateToken("invalid-token")).isFalse();
   }
 }

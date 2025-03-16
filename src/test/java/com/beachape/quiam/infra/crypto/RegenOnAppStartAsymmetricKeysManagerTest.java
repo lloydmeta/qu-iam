@@ -1,8 +1,6 @@
 package com.beachape.quiam.infra.crypto;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.Test;
 
@@ -14,8 +12,8 @@ final class RegenOnAppStartAsymmetricKeysManagerTest {
 
     assertThat(manager.getPrivateKey()).isNotNull();
     assertThat(manager.getPublicKey()).isNotNull();
-    assertEquals("RSA", manager.getPrivateKey().getAlgorithm());
-    assertEquals("RSA", manager.getPublicKey().getAlgorithm());
+    assertThat(manager.getPrivateKey().getAlgorithm()).isEqualTo("RSA");
+    assertThat(manager.getPublicKey().getAlgorithm()).isEqualTo("RSA");
   }
 
   @Test
@@ -23,7 +21,9 @@ final class RegenOnAppStartAsymmetricKeysManagerTest {
     RegenOnAppStartAsymmetricKeysManager manager1 = new RegenOnAppStartAsymmetricKeysManager();
     RegenOnAppStartAsymmetricKeysManager manager2 = new RegenOnAppStartAsymmetricKeysManager();
 
-    assertNotEquals(manager1.getPrivateKey().getEncoded(), manager2.getPrivateKey().getEncoded());
-    assertNotEquals(manager1.getPublicKey().getEncoded(), manager2.getPublicKey().getEncoded());
+    assertThat(manager1.getPrivateKey().getEncoded())
+        .isNotEqualTo(manager2.getPrivateKey().getEncoded());
+    assertThat(manager1.getPublicKey().getEncoded())
+        .isNotEqualTo(manager2.getPublicKey().getEncoded());
   }
 }
