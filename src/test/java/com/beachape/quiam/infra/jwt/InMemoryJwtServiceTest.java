@@ -26,7 +26,9 @@ final class InMemoryJwtServiceTest {
   @Test
   void createToken_shouldCreateValidToken() throws Exception {
     String userId = "user123";
-    when(apiKeyService.createApiKey(userId)).thenReturn("api-key-123");
+    String apiKey = "api-key-123";
+    when(apiKeyService.createApiKey(userId)).thenReturn(apiKey);
+    when(apiKeyService.validateApiKey(apiKey)).thenReturn(userId);
 
     String token = service.createToken(userId);
 
@@ -35,19 +37,23 @@ final class InMemoryJwtServiceTest {
 
     // Verify token can be validated
     service.validateToken(token);
+    verify(apiKeyService).validateApiKey(apiKey);
   }
 
   @Test
   void validateToken_shouldValidateApiKey() throws Exception {
     String userId = "user123";
-    when(apiKeyService.createApiKey(userId)).thenReturn("api-key-123");
+    String apiKey = "api-key-123";
+    when(apiKeyService.createApiKey(userId)).thenReturn(apiKey);
+    when(apiKeyService.validateApiKey(apiKey)).thenReturn(userId);
+
     String token = service.createToken(userId);
 
     String validatedUserId = service.validateToken(token);
 
     assertEquals(userId, validatedUserId);
 
-    verify(apiKeyService).validateApiKey("api-key-123");
+    verify(apiKeyService).validateApiKey(apiKey);
   }
 
   @Test
@@ -59,12 +65,15 @@ final class InMemoryJwtServiceTest {
   @Test
   void invalidateToken_shouldDeleteApiKey() throws Exception {
     String userId = "user123";
-    when(apiKeyService.createApiKey(userId)).thenReturn("api-key-123");
+    String apiKey = "api-key-123";
+    when(apiKeyService.createApiKey(userId)).thenReturn(apiKey);
+    when(apiKeyService.deleteApiKey(apiKey)).thenReturn(true);
     String token = service.createToken(userId);
 
     service.invalidateToken(token);
 
     verify(apiKeyService).deleteApiKey("api-key-123");
+    verify(apiKeyService).deleteApiKey(apiKey);
   }
 
   @Test

@@ -5,6 +5,7 @@ import com.beachape.quiam.domain.crypto.AsymmetricKeysManager;
 import com.beachape.quiam.domain.jwt.JwtService;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.smallrye.jwt.auth.principal.JWTParser;
+import io.smallrye.jwt.auth.principal.ParseException;
 import io.smallrye.jwt.build.Jwt;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Default;
@@ -46,9 +47,12 @@ public class InMemoryJwtService implements JwtService {
     try {
       JsonWebToken jwt = parser.verify(token, keysManager.getPublicKey());
       String apiKey = jwt.getClaim(API_KEY_CLAIM).toString();
-      apiKeyService.validateApiKey(apiKey);
-      return jwt.getSubject();
-    } catch (Exception e) {
+      if (apiKeyService.validateApiKey(apiKey) == null) {
+        throw new TokenValidationException("Invalid API key.");
+      } else {
+        return jwt.getSubject();
+      }
+    } catch (ParseException e) {
       throw new TokenValidationException(e);
     }
   }
@@ -59,8 +63,10 @@ public class InMemoryJwtService implements JwtService {
     try {
       JsonWebToken jwt = parser.verify(token, keysManager.getPublicKey());
       String apiKey = jwt.getClaim(API_KEY_CLAIM).toString();
-      apiKeyService.deleteApiKey(apiKey);
-    } catch (Exception e) {
+      if (!apiKeyService.deleteApiKey(apiKey)) {
+        throw new TokenValidationException("Token does not exist in backend.");
+      }
+    } catch (ParseException e) {
       throw new TokenValidationException(e);
     }
   }

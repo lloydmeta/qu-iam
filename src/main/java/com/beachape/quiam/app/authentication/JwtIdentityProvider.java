@@ -44,7 +44,7 @@ public class JwtIdentityProvider implements IdentityProvider<TokenAuthentication
             });
   }
 
-  public static class InvalidTokenException extends SecurityException {
+  public static class InvalidTokenException extends RuntimeException {
     public InvalidTokenException(String message, Throwable cause) {
       super(message, cause);
     }
