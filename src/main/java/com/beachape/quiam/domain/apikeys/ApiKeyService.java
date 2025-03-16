@@ -1,14 +1,24 @@
 package com.beachape.quiam.domain.apikeys;
 
-import com.beachape.quiam.domain.errors.DomainException;
+import jakarta.annotation.Nullable;
 
 public interface ApiKeyService {
 
   String createApiKey(String userId);
 
-  void deleteApiKey(String apiKey) throws ApiKeyNotFoundException;
+  /**
+   * Deletes the API key if it exists.
+   *
+   * @param apiKey the API key to be deleted
+   * @return true if the API key existed and was deleted, otherwise false
+   */
+  boolean deleteApiKey(String apiKey);
 
-  String validateApiKey(String apiKey) throws ApiKeyNotFoundException;
-
-  public class ApiKeyNotFoundException extends DomainException {}
+  /**
+   * Validates the provided API key.
+   *
+   * @param apiKey the API key to validate
+   * @return the user ID if the key is validated, otherwise returns null
+   */
+  @Nullable String validateApiKey(String apiKey);
 }
