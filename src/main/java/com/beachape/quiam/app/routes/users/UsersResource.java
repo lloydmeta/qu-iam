@@ -69,7 +69,8 @@ public class UsersResource {
       User user = usersService.authenticate(request.username(), request.password());
       String token = jwtService.createToken(user.name());
 
-      NewCookie sessionCookie =
+      NewCookie sessionCookie;
+      sessionCookie =
           new NewCookie.Builder("session")
               .value(token)
               .path("/")
@@ -80,14 +81,19 @@ public class UsersResource {
       return Response.ok(new AuthenticationResponse(user.name(), token))
           .cookie(sessionCookie)
           .build();
-    } catch (UsersService.NoSuchUser e) {
-      return Response.status(Response.Status.NOT_FOUND)
-          .entity(new ErrorResponse("User not found"))
-          .build();
-    } catch (UsersService.InvalidPassword e) {
-      return Response.status(Response.Status.UNAUTHORIZED)
-          .entity(new ErrorResponse("Invalid password"))
-          .build();
+    } catch (UsersService.UsersServiceException e) {
+      return switch (e) {
+        case UsersService.NoSuchUser _ -> {
+          yield Response.status(Response.Status.NOT_FOUND)
+              .entity(new ErrorResponse("User not found"))
+              .build();
+        }
+        case UsersService.InvalidPassword _ -> {
+          yield Response.status(Response.Status.UNAUTHORIZED)
+              .entity(new ErrorResponse("Invalid password"))
+              .build();
+        }
+      };
     }
   }
 
