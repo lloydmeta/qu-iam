@@ -1,5 +1,6 @@
 package com.beachape.quiam.domain.users;
 
+import com.beachape.quiam.domain.errors.DomainException;
 import lombok.Builder;
 
 public interface UsersService {
@@ -11,10 +12,10 @@ public interface UsersService {
   public User authenticate(String name, String password) throws NoSuchUser, InvalidPassword;
 
   // Domain errors
-  public static class NoSuchUser extends Exception {}
+  public static class NoSuchUser extends DomainException {}
   ;
 
-  public static class InvalidPassword extends Exception {}
+  public static class InvalidPassword extends DomainException {}
   ;
 
   @Builder
