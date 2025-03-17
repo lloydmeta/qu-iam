@@ -44,6 +44,11 @@ jobs:
       env:
         GRAALVM_HOME: ${{ env.JAVA_HOME }}
 
+    - name: Run native integration tests
+      run: ./gradlew testNative
+      env:
+        GRAALVM_HOME: ${{ env.JAVA_HOME }}
+
     - name: Run integration tests
       run: ./gradlew quarkusIntTest
       env:
