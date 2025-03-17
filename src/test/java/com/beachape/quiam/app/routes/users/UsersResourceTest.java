@@ -2,14 +2,10 @@ package com.beachape.quiam.app.routes.users;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 
-import com.beachape.quiam.domain.jwt.JwtService;
-import com.beachape.quiam.domain.users.UsersService;
-import com.beachape.quiam.domain.users.UsersService.UpsertUser;
-import com.beachape.quiam.domain.users.UsersService.User;
-import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.ws.rs.core.MediaType;
 import org.junit.jupiter.api.Test;
@@ -18,16 +14,11 @@ import org.junit.jupiter.api.Test;
 @QuarkusTest
 class UsersResourceTest {
 
-  @InjectMock UsersService usersService;
-
-  @InjectMock JwtService jwtService;
-
   @Test
   void upsertUser_shouldReturnSuccessMessage_whenSuccessful() {
     // Given
-    ApiModels.UpsertUserRequest request =
-        new ApiModels.UpsertUserRequest("testUser", "password123");
-    UpsertUser domainUser = new UpsertUser("testUser", "password123");
+    String username = "testUser1";
+    ApiModels.UpsertUserRequest request = new ApiModels.UpsertUserRequest(username, "password123");
 
     // When
     ApiModels.UpsertUserResponse response =
@@ -43,43 +34,48 @@ class UsersResourceTest {
 
     // Then
     assertThat(response).isEqualTo(new ApiModels.UpsertUserResponse("User upserted successfully"));
-    verify(usersService).upsert(domainUser);
   }
 
   @Test
-  void authenticate_shouldReturnTokenAndSetCookie_whenCredentialsValid() throws Exception {
+  void authenticate_shouldReturnTokenAndSetCookie_whenCredentialsValid() {
     // Given
-    ApiModels.AuthenticationRequest request =
-        new ApiModels.AuthenticationRequest("testUser", "password123");
-    when(usersService.authenticate("testUser", "password123"))
-        .thenReturn(new User("testUser", "hashedPassword"));
-    when(jwtService.createToken("testUser")).thenReturn("jwt-token-123");
+    String username = "testUser2";
+    ApiModels.UpsertUserRequest upsertRequest =
+        new ApiModels.UpsertUserRequest(username, "password123");
+    given()
+        .contentType("application/json")
+        .body(upsertRequest)
+        .when()
+        .post("/api/users/_upsert")
+        .then()
+        .statusCode(200);
+
+    ApiModels.AuthenticationRequest authRequest =
+        new ApiModels.AuthenticationRequest(username, "password123");
 
     // When
     var response =
         given()
             .contentType("application/json")
-            .body(request)
+            .body(authRequest)
             .when()
             .post("/api/users/_login")
             .then()
             .statusCode(200);
 
     // Then
-    response.cookie("session", "jwt-token-123");
+    response.cookie("session", is(not(nullValue())));
     ApiModels.AuthenticationResponse authResponse =
         response.extract().as(ApiModels.AuthenticationResponse.class);
-    assertThat(authResponse.username()).isEqualTo("testUser");
-    assertThat(authResponse.token()).isEqualTo("jwt-token-123");
+    assertThat(authResponse.username()).isEqualTo(username);
+    assertThat(authResponse.token()).isNotNull();
   }
 
   @Test
-  void authenticate_shouldReturn404_whenUserNotFound() throws Exception {
+  void authenticate_shouldReturn404_whenUserNotFound() {
     // Given
     ApiModels.AuthenticationRequest request =
-        new ApiModels.AuthenticationRequest("testUser", "password123");
-    when(usersService.authenticate("testUser", "password123"))
-        .thenThrow(new UsersService.NoSuchUser());
+        new ApiModels.AuthenticationRequest("nonexistentUser", "password123");
 
     // When/Then
     ApiModels.ErrorResponse response =
@@ -97,18 +93,27 @@ class UsersResourceTest {
   }
 
   @Test
-  void authenticate_shouldReturn401_whenPasswordInvalid() throws Exception {
+  void authenticate_shouldReturn401_whenPasswordInvalid() {
     // Given
-    ApiModels.AuthenticationRequest request =
-        new ApiModels.AuthenticationRequest("testUser", "password123");
-    when(usersService.authenticate("testUser", "password123"))
-        .thenThrow(new UsersService.InvalidPassword());
+    String username = "testUser3";
+    ApiModels.UpsertUserRequest upsertRequest =
+        new ApiModels.UpsertUserRequest(username, "password123");
+    given()
+        .contentType("application/json")
+        .body(upsertRequest)
+        .when()
+        .post("/api/users/_upsert")
+        .then()
+        .statusCode(200);
+
+    ApiModels.AuthenticationRequest authRequest =
+        new ApiModels.AuthenticationRequest(username, "wrongPassword");
 
     // When/Then
     ApiModels.ErrorResponse response =
         given()
             .contentType("application/json")
-            .body(request)
+            .body(authRequest)
             .when()
             .post("/api/users/_login")
             .then()
@@ -120,14 +125,36 @@ class UsersResourceTest {
   }
 
   @Test
-  void logout_shouldClearCookie_whenValidToken() throws Exception {
+  void logout_shouldClearCookie_whenValidToken() {
     // Given
-    when(jwtService.validateToken("valid-token")).thenReturn("test-user");
-    when(jwtService.invalidateToken("valid-token")).thenReturn(true);
+    String username = "testUser4";
+    ApiModels.UpsertUserRequest upsertRequest =
+        new ApiModels.UpsertUserRequest(username, "password123");
+    given()
+        .contentType("application/json")
+        .body(upsertRequest)
+        .when()
+        .post("/api/users/_upsert")
+        .then()
+        .statusCode(200);
+
+    ApiModels.AuthenticationRequest authRequest =
+        new ApiModels.AuthenticationRequest(username, "password123");
+    var loginResponse =
+        given()
+            .contentType("application/json")
+            .body(authRequest)
+            .when()
+            .post("/api/users/_login")
+            .then()
+            .statusCode(200)
+            .extract()
+            .as(ApiModels.AuthenticationResponse.class);
+
     // When
     var response =
         given()
-            .cookie("session", "valid-token")
+            .cookie("session", loginResponse.token())
             .when()
             .post("/api/users/_logout")
             .then()
@@ -135,16 +162,10 @@ class UsersResourceTest {
 
     // Then
     response.cookie("session", "");
-    verify(jwtService).validateToken("valid-token");
-    verify(jwtService).invalidateToken("valid-token");
   }
 
   @Test
-  void logout_shouldReturn400_whenInvalidToken() throws Exception {
-    // Given
-    when(jwtService.validateToken("invalid-token")).thenReturn(null);
-    when(jwtService.invalidateToken("invalid-token")).thenReturn(false);
-
+  void logout_shouldReturn401_whenInvalidToken() {
     // When/Then
     ApiModels.ErrorResponse response =
         given()
@@ -156,19 +177,43 @@ class UsersResourceTest {
             .extract()
             .as(ApiModels.ErrorResponse.class);
 
-    verify(jwtService).validateToken("invalid-token");
-
     assertThat(response.error()).isEqualTo("Invalid token");
   }
 
   @Test
-  void getUser_shouldReturn200_whenValidToken() throws Exception {
+  void getUser_shouldReturn200_whenValidToken() {
     // Given
-    when(jwtService.validateToken("valid-token")).thenReturn("test-user");
-    // When/Then
-    given().cookie("session", "valid-token").when().get("/api/users/me").then().statusCode(200);
+    String username = "testUser5";
+    ApiModels.UpsertUserRequest upsertRequest =
+        new ApiModels.UpsertUserRequest(username, "password123");
+    given()
+        .contentType("application/json")
+        .body(upsertRequest)
+        .when()
+        .post("/api/users/_upsert")
+        .then()
+        .statusCode(200);
 
-    verify(jwtService).validateToken("valid-token");
+    ApiModels.AuthenticationRequest authRequest =
+        new ApiModels.AuthenticationRequest(username, "password123");
+    var loginResponse =
+        given()
+            .contentType("application/json")
+            .body(authRequest)
+            .when()
+            .post("/api/users/_login")
+            .then()
+            .statusCode(200)
+            .extract()
+            .as(ApiModels.AuthenticationResponse.class);
+
+    // When/Then
+    given()
+        .cookie("session", loginResponse.token())
+        .when()
+        .get("/api/users/me")
+        .then()
+        .statusCode(200);
   }
 
   @Test
@@ -188,10 +233,7 @@ class UsersResourceTest {
   }
 
   @Test
-  void getUser_shouldReturn401_whenInvalidToken() throws Exception {
-    // Given
-    when(jwtService.validateToken("invalid-token")).thenReturn(null);
-
+  void getUser_shouldReturn401_whenInvalidToken() {
     // When/Then
     ApiModels.ErrorResponse response =
         given()
@@ -207,18 +249,25 @@ class UsersResourceTest {
   }
 
   @Test
-  void getUser_shouldAcceptBearerToken() throws Exception {
+  void getUser_shouldAcceptBearerToken() {
     // Given
-    when(usersService.authenticate("test-user", "test-pass"))
-        .thenReturn(new User("test-user", "test-pass"));
-    when(jwtService.createToken("test-user")).thenReturn("valid-token");
-    when(jwtService.validateToken("valid-token")).thenReturn("test-user");
+    String username = "testUser6";
+    ApiModels.UpsertUserRequest upsertRequest =
+        new ApiModels.UpsertUserRequest(username, "password123");
+    given()
+        .contentType("application/json")
+        .body(upsertRequest)
+        .when()
+        .post("/api/users/_upsert")
+        .then()
+        .statusCode(200);
 
-    // First authenticate to get the token
-    ApiModels.AuthenticationResponse authResponse =
+    ApiModels.AuthenticationRequest authRequest =
+        new ApiModels.AuthenticationRequest(username, "password123");
+    var loginResponse =
         given()
             .contentType(MediaType.APPLICATION_JSON)
-            .body(new ApiModels.AuthenticationRequest("test-user", "test-pass"))
+            .body(authRequest)
             .when()
             .post("/api/users/_login")
             .then()
@@ -228,7 +277,7 @@ class UsersResourceTest {
 
     // Then use the token in Authorization header
     given()
-        .header("Authorization", "Bearer " + authResponse.token())
+        .header("Authorization", "Bearer " + loginResponse.token())
         .when()
         .get("/api/users/me")
         .then()
@@ -236,10 +285,7 @@ class UsersResourceTest {
   }
 
   @Test
-  void getUser_shouldReturn401_whenInvalidBearerToken() throws Exception {
-    // Given
-    when(jwtService.validateToken("invalid-token")).thenReturn(null);
-
+  void getUser_shouldReturn401_whenInvalidBearerToken() {
     // When/Then
     ApiModels.ErrorResponse response =
         given()
@@ -256,19 +302,25 @@ class UsersResourceTest {
   }
 
   @Test
-  void logout_shouldAcceptBearerToken() throws Exception {
+  void logout_shouldAcceptBearerToken() {
     // Given
-    when(usersService.authenticate("test-user", "test-pass"))
-        .thenReturn(new User("test-user", "test-pass"));
-    when(jwtService.createToken("test-user")).thenReturn("valid-token");
-    when(jwtService.validateToken("valid-token")).thenReturn("test-user");
-    when(jwtService.invalidateToken("valid-token")).thenReturn(true);
+    String username = "testUser7";
+    ApiModels.UpsertUserRequest upsertRequest =
+        new ApiModels.UpsertUserRequest(username, "password123");
+    given()
+        .contentType("application/json")
+        .body(upsertRequest)
+        .when()
+        .post("/api/users/_upsert")
+        .then()
+        .statusCode(200);
 
-    // First authenticate to get the token
-    ApiModels.AuthenticationResponse authResponse =
+    ApiModels.AuthenticationRequest authRequest =
+        new ApiModels.AuthenticationRequest(username, "password123");
+    var loginResponse =
         given()
             .contentType(MediaType.APPLICATION_JSON)
-            .body(new ApiModels.AuthenticationRequest("test-user", "test-pass"))
+            .body(authRequest)
             .when()
             .post("/api/users/_login")
             .then()
@@ -278,21 +330,15 @@ class UsersResourceTest {
 
     // Then use the token in Authorization header for logout
     given()
-        .header("Authorization", "Bearer " + authResponse.token())
+        .header("Authorization", "Bearer " + loginResponse.token())
         .when()
         .post("/api/users/_logout")
         .then()
         .statusCode(200);
-
-    verify(jwtService).validateToken(authResponse.token());
-    verify(jwtService).invalidateToken(authResponse.token());
   }
 
   @Test
-  void logout_shouldReturn401_whenInvalidBearerToken() throws Exception {
-    // Given
-    when(jwtService.validateToken("invalid-token")).thenReturn(null);
-
+  void logout_shouldReturn401_whenInvalidBearerToken() {
     // When/Then
     ApiModels.ErrorResponse response =
         given()
